@@ -5,6 +5,10 @@
   <groupId>org.pigeon</groupId>
   <artifactId>pigeon</artifactId>
   <version>1.0.0</version>
+  <modules>
+    <module>pigeon-core</module>
+    <module>pigeon-demo</module>
+  </modules>
   <packaging>pom</packaging>
 
   <distributionManagement>

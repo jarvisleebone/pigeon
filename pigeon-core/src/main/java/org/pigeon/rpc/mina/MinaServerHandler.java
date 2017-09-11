@@ -28,7 +28,6 @@ public class MinaServerHandler extends StreamIoHandler {
         LOGGER.info("session created : " + session.getId());
     }
 
-
     @Override
     protected void processStreamIo(IoSession session, InputStream in, OutputStream out) {
         LOGGER.info("请求");
@@ -36,7 +35,6 @@ public class MinaServerHandler extends StreamIoHandler {
             ObjectInput objectInput = new ObjectInputStream(in);
             PigeonRequest request = serializer.deserialize((byte[]) objectInput.readObject(), PigeonRequest.class);
 
-            // TODO 反射执行请求接口，拿到返回值写入out
 
 
 

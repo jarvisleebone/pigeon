@@ -3,9 +3,11 @@ package org.pigeon.rpc;
 import org.pigeon.common.enums.RegistryProtocolEnum;
 import org.pigeon.config.PigeonConfig;
 import org.pigeon.config.RegistryConfig;
+import org.pigeon.proxy.ClientInvocationHandler;
 import org.pigeon.registry.ServiceRegister;
 import org.pigeon.registry.zookeeper.ZKServiceRegister;
 
+import java.lang.reflect.Proxy;
 import java.util.Set;
 
 public abstract class RpcHandler<T> {

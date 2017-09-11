@@ -6,11 +6,7 @@ import org.apache.mina.handler.stream.StreamIoHandler;
 import org.pigeon.codec.Serializer;
 import org.pigeon.model.PigeonRequest;
 
-import java.io.InputStream;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.OutputStream;
-import java.io.IOException;
+import java.io.*;
 
 
 public class MinaServerHandler extends StreamIoHandler {
@@ -30,7 +26,6 @@ public class MinaServerHandler extends StreamIoHandler {
 
     @Override
     protected void processStreamIo(IoSession session, InputStream in, OutputStream out) {
-        LOGGER.info("请求");
         try {
             ObjectInput objectInput = new ObjectInputStream(in);
             PigeonRequest request = serializer.deserialize((byte[]) objectInput.readObject(), PigeonRequest.class);

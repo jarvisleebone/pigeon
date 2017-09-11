@@ -4,10 +4,8 @@ import org.pigeon.config.ClientConfig;
 import org.pigeon.config.PigeonConfig;
 import org.pigeon.config.RegistryConfig;
 import org.pigeon.config.ServiceConfig;
-import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.w3c.dom.Element;
 

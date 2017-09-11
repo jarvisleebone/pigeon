@@ -21,6 +21,11 @@ public class ClientConfig<T> implements ApplicationListener, FactoryBean<T> {
         }
     }
 
+    @Override
+    public T getObject() throws Exception {
+        return create(interfaceClass);
+    }
+
     @SuppressWarnings("unchecked")
     private <T> T create(Class<T> interfaceClass) {
         return (T) Proxy.newProxyInstance(
@@ -28,11 +33,6 @@ public class ClientConfig<T> implements ApplicationListener, FactoryBean<T> {
                 new Class<?>[]{interfaceClass},
                 new ClientInvocationHandler<>(interfaceClass)
         );
-    }
-
-    @Override
-    public T getObject() throws Exception {
-        return create(interfaceClass);
     }
 
     @Override

@@ -3,18 +3,13 @@ package org.pigeon.rpc.mina;
 import org.apache.log4j.Logger;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
-import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
-import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
-import org.pigeon.codec.ProtostuffSerializer;
 import org.pigeon.codec.SerializerFactory;
 import org.pigeon.config.PigeonConfig;
 import org.pigeon.rpc.RpcHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
 
 public class MinaRpcHandler extends RpcHandler {
 

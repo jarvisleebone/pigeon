@@ -6,6 +6,7 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.pigeon.codec.SerializerFactory;
 import org.pigeon.config.PigeonConfig;
+import org.pigeon.model.PigeonRequest;
 import org.pigeon.rpc.RpcHandler;
 
 import java.io.IOException;
@@ -17,7 +18,6 @@ public class MinaRpcHandler extends RpcHandler {
 
     @Override
     public void bindService(PigeonConfig pigeonConfig) {
-
         try {
             // 创建服务端监控线程
             IoAcceptor acceptor = new NioSocketAcceptor();
@@ -36,5 +36,15 @@ public class MinaRpcHandler extends RpcHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public Object sendMessage(PigeonRequest request) {
+
+
+
+
+
+        return null;
     }
 }

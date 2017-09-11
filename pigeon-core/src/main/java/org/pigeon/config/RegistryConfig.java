@@ -1,14 +1,23 @@
 package org.pigeon.config;
 
-import java.io.Serializable;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
 
-public class RegistryConfig implements Serializable {
+public class RegistryConfig implements ApplicationListener {
 
-    private static final long serialVersionUID = 470591081823416394L;
     private String id;
     private String address;
     private int port;
     private String protocol;
+
+    @Override
+    public void onApplicationEvent(ApplicationEvent applicationEvent) {
+        if (0 == PigeonConfig.interfaceNames.size()) return;
+
+
+
+
+    }
 
     public String getId() {
         return id;

@@ -15,7 +15,7 @@ public class ClientConfig<T> implements ApplicationListener, FactoryBean<T> {
     @Override
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
         try {
-            interfaceClass = (Class) Class.forName(interfaceClass.getName(), true, Thread.currentThread().getContextClassLoader());
+            interfaceClass = (Class<T>) Class.forName(interfaceClass.getName(), true, Thread.currentThread().getContextClassLoader());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }

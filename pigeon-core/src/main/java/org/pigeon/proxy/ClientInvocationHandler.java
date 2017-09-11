@@ -4,9 +4,9 @@
  */
 package org.pigeon.proxy;
 
+import org.pigeon.config.handler.ConfigHandler;
 import org.pigeon.model.PigeonRequest;
 import org.pigeon.rpc.RpcHandler;
-import org.pigeon.rpc.RpcHandlerFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -24,8 +24,7 @@ public class ClientInvocationHandler<T> implements InvocationHandler {
 
     public ClientInvocationHandler(Class<T> clazz) {
         this.clazz = clazz;
-        // TODO 暂时写死mina
-        this.rpcHandler = RpcHandlerFactory.getRpcHandler("mina");
+        this.rpcHandler = ConfigHandler.rpcHandler;
     }
 
     @Override

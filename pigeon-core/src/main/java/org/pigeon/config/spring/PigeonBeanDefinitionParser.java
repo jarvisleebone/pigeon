@@ -1,9 +1,17 @@
 package org.pigeon.config.spring;
 
+import org.apache.commons.lang3.StringUtils;
+import org.pigeon.codec.SerializerFactory;
+import org.pigeon.common.enums.RegistryProtocolEnum;
+import org.pigeon.common.enums.RpcProtocolEnum;
+import org.pigeon.common.enums.SerializerProtocolEnum;
 import org.pigeon.config.ClientConfig;
 import org.pigeon.config.PigeonConfig;
 import org.pigeon.config.RegistryConfig;
 import org.pigeon.config.ServiceConfig;
+import org.pigeon.config.handler.ConfigHandler;
+import org.pigeon.registry.RegisterHandlerFactory;
+import org.pigeon.rpc.RpcHandlerFactory;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
@@ -20,26 +28,49 @@ public class PigeonBeanDefinitionParser extends AbstractSingleBeanDefinitionPars
     @Override
     protected void doParse(Element element, BeanDefinitionBuilder builder) {
         builder.addPropertyValue("id", element.getAttribute("id"));
-
         if (PigeonConfig.class.equals(beanClass)) {
-            builder.addPropertyValue("address", element.getAttribute("address"));
-            builder.addPropertyValue("port", element.getAttribute("port"));
-            builder.addPropertyValue("protocol", element.getAttribute("protocol"));
-            builder.addPropertyValue("serializer", element.getAttribute("serializer"));
+            String address = element.getAttribute("address");
+            String port = element.getAttribute("port");
+            String protocol = element.getAttribute("protocol");
+            String serializer = element.getAttribute("serializer");
+
+            if (StringUtils.isEmpty(protocol))
+                protocol = RpcProtocolEnum.MINA.toString();
+            if (StringUtils.isEmpty(serializer))
+                serializer = SerializerProtocolEnum.PROTOSTUFF.toString();
+
+            if (StringUtils.isNotEmpty(address) && StringUtils.isNotEmpty(port)) {
+                builder.addPropertyValue("address", element.getAttribute("address"));
+                builder.addPropertyValue("port", element.getAttribute("port"));
+            }
+            builder.addPropertyValue("protocol", protocol);
+            builder.addPropertyValue("serializer", serializer);
+
+            ConfigHandler.rpcHandler = RpcHandlerFactory.getRpcHandler(protocol);
+            ConfigHandler.serializer = SerializerFactory.getSerializer(serializer);
         }
         if (RegistryConfig.class.equals(beanClass)) {
-            builder.addPropertyValue("address", element.getAttribute("address"));
-            builder.addPropertyValue("port", element.getAttribute("port"));
-            builder.addPropertyValue("protocol", element.getAttribute("protocol"));
+            String address = element.getAttribute("address");
+            int port = Integer.parseInt(element.getAttribute("port"));
+            String protocol = element.getAttribute("protocol");
+            if (StringUtils.isEmpty(protocol))
+                protocol = RegistryProtocolEnum.ZOOKEEPER.toString();
+
+            builder.addPropertyValue("address", address);
+            builder.addPropertyValue("port", port);
+            builder.addPropertyValue("protocol", protocol);
+            ConfigHandler.registerHandler = RegisterHandlerFactory.getRegisterHandler(protocol, address, port);
         }
         if (ServiceConfig.class.equals(beanClass)) {
             String interfaceName = element.getAttribute("interface");
-            PigeonConfig.interfaceNames.add(interfaceName);
+            PigeonConfig.serverInterfaceNames.add(interfaceName);
             builder.addPropertyValue("interface", interfaceName);
             builder.addPropertyValue("ref", new RuntimeBeanReference(element.getAttribute("ref")));
         }
         if (ClientConfig.class.equals(beanClass)) {
-            builder.addPropertyValue("interface", element.getAttribute("interface"));
+            String interfaceName = element.getAttribute("interface");
+            PigeonConfig.clientInterfaceNames.add(interfaceName);
+            builder.addPropertyValue("interface", interfaceName);
         }
     }
 

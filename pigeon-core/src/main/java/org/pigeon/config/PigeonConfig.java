@@ -2,42 +2,43 @@ package org.pigeon.config;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.mina.util.ConcurrentHashSet;
+import org.pigeon.config.handler.ConfigHandler;
+import org.pigeon.registry.RegisterHandler;
 import org.pigeon.rpc.RpcHandler;
-import org.pigeon.rpc.RpcHandlerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class PigeonConfig implements ApplicationListener, BeanFactoryAware{
+public class PigeonConfig implements ApplicationListener{
 
-    public static final Set<String> interfaceNames = new ConcurrentHashSet<>();
+    // 服务端提供的所有接口名字，会写入注册中心
+    public static final Set<String> serverInterfaceNames = new ConcurrentHashSet<>();
+    // 客户端需要的所有接口名字
+    public static final Set<String> clientInterfaceNames = new ConcurrentHashSet<>();
     private String id;
     private String address;
     private int port;
     private String protocol;
     private String serializer;
-    private RpcHandler rpcHandler;
-    private BeanFactory beanFactory;
-
-    @Override
-    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-        this.beanFactory = beanFactory;
-    }
 
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
-        if (StringUtils.isEmpty(address) || 0 == port) return;
+        RpcHandler rpcHandler = ConfigHandler.rpcHandler;
+        RegisterHandler registerHandler = ConfigHandler.registerHandler;
 
-        rpcHandler = RpcHandlerFactory.getRpcHandler(protocol);
-        // 绑定端口
-        rpcHandler.bindService(this);
-        // 注册服务
-        RegistryConfig registryConfig = beanFactory.getBean(RegistryConfig.class);
-        rpcHandler.register(this, registryConfig, interfaceNames);
+        if (StringUtils.isNotEmpty(address) && 0 != port && 0 != serverInterfaceNames.size()) {
+            // 绑定端口
+            rpcHandler.bindService(port);
+            // 注册服务
+            registerHandler.registerService(address + ":" + port, serverInterfaceNames);
+        }
+        if (0 != clientInterfaceNames.size()) {
+            registerHandler.loadServices(clientInterfaceNames);
+        }
     }
 
     public String getId() {

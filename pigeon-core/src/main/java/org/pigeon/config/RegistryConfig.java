@@ -1,23 +1,11 @@
 package org.pigeon.config;
 
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
-
-public class RegistryConfig implements ApplicationListener {
+public class RegistryConfig {
 
     private String id;
     private String address;
     private int port;
     private String protocol;
-
-    @Override
-    public void onApplicationEvent(ApplicationEvent applicationEvent) {
-        if (0 == PigeonConfig.interfaceNames.size()) return;
-
-
-
-
-    }
 
     public String getId() {
         return id;

@@ -30,7 +30,7 @@ public class MinaServerHandler extends StreamIoHandler {
             ObjectInput objectInput = new ObjectInputStream(in);
             PigeonRequest request = serializer.deserialize((byte[]) objectInput.readObject(), PigeonRequest.class);
 
-
+            // TODO 接收客户端请求，反射执行该接口实现，返回响应
 
 
         } catch (IOException e) {

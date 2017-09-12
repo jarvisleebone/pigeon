@@ -61,7 +61,8 @@ public class MinaRpcHandler extends RpcHandler {
         connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
         // 设置连接超时检查时间
         connector.setConnectTimeoutCheckInterval(30);
-        connector.setHandler(new MinaClientHandler());
+        // 异步处理响应
+//        connector.setHandler(new MinaClientHandler());
         // 使用同步连接
         connector.getSessionConfig().setUseReadOperation(true);
         // 建立连接

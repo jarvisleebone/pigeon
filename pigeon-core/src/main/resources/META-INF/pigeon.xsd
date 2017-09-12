@@ -25,6 +25,7 @@
                     <xsd:attribute name="port" type="xsd:int" />
                     <xsd:attribute name="protocol" type="xsd:string" />
                     <xsd:attribute name="serializer" type="xsd:string" />
+                    <xsd:attribute name="route" type="xsd:string" />
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>

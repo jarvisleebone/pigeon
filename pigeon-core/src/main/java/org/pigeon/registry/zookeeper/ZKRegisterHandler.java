@@ -8,6 +8,7 @@ import org.I0Itec.zkclient.ZkClient;
 import org.pigeon.common.constant.Constant;
 import org.pigeon.registry.RegisterHandler;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -24,14 +25,11 @@ public class ZKRegisterHandler implements RegisterHandler {
 
     @Override
     public void loadServices(Set<String> interfaceNames) {
-
         interfaceNames.stream().forEach((interfaceName) -> {
-            // TODO 从注册中心加载出提供该接口的所有服务端信息
-
-
-
+            // 从注册中心加载出提供该接口的所有服务端信息
+            List<String> servers = zkClient.getChildren(Constant.ZKRootPath + Constant.ZKServicePath + Constant.PATH_SEPARATOR + interfaceName);
+            RegisterHandler.services.put(interfaceName, servers);
         });
-
     }
 
     @Override

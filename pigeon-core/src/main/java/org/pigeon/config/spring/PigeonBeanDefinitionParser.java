@@ -3,6 +3,7 @@ package org.pigeon.config.spring;
 import org.apache.commons.lang3.StringUtils;
 import org.pigeon.codec.SerializerFactory;
 import org.pigeon.common.enums.RegistryProtocolEnum;
+import org.pigeon.common.enums.RouteProtocolEnum;
 import org.pigeon.common.enums.RpcProtocolEnum;
 import org.pigeon.common.enums.SerializerProtocolEnum;
 import org.pigeon.config.ClientConfig;
@@ -11,6 +12,7 @@ import org.pigeon.config.RegistryConfig;
 import org.pigeon.config.ServiceConfig;
 import org.pigeon.config.handler.ConfigHandler;
 import org.pigeon.registry.RegisterHandlerFactory;
+import org.pigeon.router.RouterFactory;
 import org.pigeon.rpc.RpcHandlerFactory;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -33,11 +35,14 @@ public class PigeonBeanDefinitionParser extends AbstractSingleBeanDefinitionPars
             String port = element.getAttribute("port");
             String protocol = element.getAttribute("protocol");
             String serializer = element.getAttribute("serializer");
+            String route = element.getAttribute("route");
 
             if (StringUtils.isEmpty(protocol))
                 protocol = RpcProtocolEnum.MINA.toString();
             if (StringUtils.isEmpty(serializer))
                 serializer = SerializerProtocolEnum.PROTOSTUFF.toString();
+            if (StringUtils.isEmpty(route))
+                route = RouteProtocolEnum.RANDOM.toString();
 
             if (StringUtils.isNotEmpty(address) && StringUtils.isNotEmpty(port)) {
                 builder.addPropertyValue("address", element.getAttribute("address"));
@@ -45,9 +50,11 @@ public class PigeonBeanDefinitionParser extends AbstractSingleBeanDefinitionPars
             }
             builder.addPropertyValue("protocol", protocol);
             builder.addPropertyValue("serializer", serializer);
+            builder.addPropertyValue("route", route);
 
             ConfigHandler.rpcHandler = RpcHandlerFactory.getRpcHandler(protocol);
             ConfigHandler.serializer = SerializerFactory.getSerializer(serializer);
+            ConfigHandler.router = RouterFactory.getRouter(route);
         }
         if (RegistryConfig.class.equals(beanClass)) {
             String address = element.getAttribute("address");

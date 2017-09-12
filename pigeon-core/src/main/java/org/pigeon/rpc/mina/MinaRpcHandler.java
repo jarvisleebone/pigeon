@@ -6,11 +6,13 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.pigeon.config.handler.ConfigHandler;
 import org.pigeon.model.PigeonRequest;
+import org.pigeon.registry.RegisterHandler;
+import org.pigeon.router.Router;
 import org.pigeon.rpc.RpcHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.Arrays;
+import java.util.List;
 
 public class MinaRpcHandler extends RpcHandler {
 
@@ -40,14 +42,12 @@ public class MinaRpcHandler extends RpcHandler {
 
     @Override
     public Object sendMessage(PigeonRequest request) {
-        System.out.println(request.getInterfaceName());
-        System.out.println(request.getMethodName());
-        if (request.getParameters() != null)
-            Arrays.stream(request.getParameters()).forEach((o) -> System.out.println(o.toString()));
-        if (request.getParameterTypes() != null)
-            Arrays.stream(request.getParameterTypes()).forEach((c) -> System.out.println(c.getName()));
-
         // TODO 通过配置的路由规则选取服务端，然后将request序列化后发送到该服务端，拿到返回值
+        Router router = ConfigHandler.router;
+        List<String> servers = RegisterHandler.services.get(request.getInterfaceName());
+        String serverAddress = router.elect(servers);
+
+
 
 
 

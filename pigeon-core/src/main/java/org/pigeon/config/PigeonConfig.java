@@ -24,6 +24,7 @@ public class PigeonConfig implements ApplicationListener{
     private int port;
     private String protocol;
     private String serializer;
+    private String route;
 
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
@@ -79,5 +80,13 @@ public class PigeonConfig implements ApplicationListener{
 
     public void setSerializer(String serializer) {
         this.serializer = serializer;
+    }
+
+    public String getRoute() {
+        return route;
+    }
+
+    public void setRoute(String route) {
+        this.route = route;
     }
 }

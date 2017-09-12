@@ -19,5 +19,6 @@ public class MinaClientHandler extends IoHandlerAdapter {
 
         System.out.println(message.toString());
 
+
     }
 }

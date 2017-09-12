@@ -2,6 +2,7 @@ package org.pigeon.rpc.mina;
 
 import org.apache.log4j.Logger;
 import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.future.ReadFuture;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
@@ -17,8 +18,9 @@ import org.pigeon.rpc.RpcHandler;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-public class MinaRpcHandler implements RpcHandler {
+public class MinaRpcHandler extends RpcHandler {
 
     private static final Logger LOGGER = Logger.getLogger(MinaRpcHandler.class);
 
@@ -52,27 +54,35 @@ public class MinaRpcHandler implements RpcHandler {
         String ip = serverAddress[0];
         int port = Integer.parseInt(serverAddress[1]);
 
+        Object result;
         // 创建客户端连接器
         NioSocketConnector connector = new NioSocketConnector();
 //        connector.getFilterChain().addLast("logger", new LoggingFilter());
         connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
-
         // 设置连接超时检查时间
         connector.setConnectTimeoutCheckInterval(30);
         connector.setHandler(new MinaClientHandler());
-
+        // 使用同步连接
+        connector.getSessionConfig().setUseReadOperation(true);
         // 建立连接
         ConnectFuture cf = connector.connect(new InetSocketAddress(ip, port));
         // 等待连接创建完成
         cf.awaitUninterruptibly();
-
-        cf.getSession().write(request);
-
+        cf.getSession().write(request).awaitUninterruptibly();
+        ReadFuture readFuture = cf.getSession().read();
+        //判断传输超时否
+        if(readFuture.awaitUninterruptibly(10, TimeUnit.SECONDS)){
+            result = readFuture.getMessage();
+        } else {
+            result = "time out";
+        }
+        // 关闭连接
+        cf.getSession().closeOnFlush();
         // 等待连接断开
         cf.getSession().getCloseFuture().awaitUninterruptibly();
         // 释放连接
         connector.dispose();
 
-        return null;
+        return result;
     }
 }

@@ -5,16 +5,29 @@ import org.apache.mina.core.session.IoSession;
 import org.pigeon.config.PigeonConfig;
 import org.pigeon.config.ServiceConfig;
 import org.pigeon.model.PigeonRequest;
+import org.pigeon.rpc.RpcHandler;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class MinaServerHandler extends IoHandlerAdapter {
 
     @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
-        PigeonRequest request = (PigeonRequest) message;
-        ServiceConfig serviceConfig = PigeonConfig.serviceConfigs.get(request.getInterfaceName());
-        Method method = serviceConfig.getRef().getClass().getMethod(request.getMethodName(), request.getParameterTypes());
-        session.write(method.invoke(serviceConfig.getRef(), request.getParameters()));
+        RpcHandler.submit(() -> {
+            try {
+                PigeonRequest request = (PigeonRequest) message;
+                ServiceConfig serviceConfig = PigeonConfig.serviceConfigs.get(request.getInterfaceName());
+                Method method = serviceConfig.getRef().getClass().getMethod(request.getMethodName(), request.getParameterTypes());
+                session.write(method.invoke(serviceConfig.getRef(), request.getParameters()));
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        });
     }
 }

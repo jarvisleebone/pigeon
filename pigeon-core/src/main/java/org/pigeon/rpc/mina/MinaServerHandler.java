@@ -1,23 +1,15 @@
 package org.pigeon.rpc.mina;
 
 import org.apache.log4j.Logger;
+import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.handler.stream.StreamIoHandler;
-import org.pigeon.codec.Serializer;
 import org.pigeon.model.PigeonRequest;
 
-import java.io.*;
 
-
-public class MinaServerHandler extends StreamIoHandler {
+public class MinaServerHandler extends IoHandlerAdapter {
 
     private static final Logger LOGGER = Logger.getLogger(MinaServerHandler.class);
 
-    private Serializer serializer;
-
-    public MinaServerHandler(Serializer serializer) {
-        this.serializer = serializer;
-    }
 
     @Override
     public void sessionCreated(IoSession session) throws Exception {
@@ -25,21 +17,12 @@ public class MinaServerHandler extends StreamIoHandler {
     }
 
     @Override
-    protected void processStreamIo(IoSession session, InputStream in, OutputStream out) {
-        try {
-            ObjectInput objectInput = new ObjectInputStream(in);
-            PigeonRequest request = serializer.deserialize((byte[]) objectInput.readObject(), PigeonRequest.class);
+    public void messageReceived(IoSession session, Object message) throws Exception {
+        PigeonRequest request = (PigeonRequest) message;
 
-            // TODO 接收客户端请求，反射执行该接口实现，返回响应
+        System.out.println(request.getInterfaceName());
+        System.out.println(request.getMethodName());
 
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-
+        session.write("result");
     }
-
 }

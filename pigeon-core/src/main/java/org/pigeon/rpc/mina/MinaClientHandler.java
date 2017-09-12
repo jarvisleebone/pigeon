@@ -4,30 +4,20 @@
  */
 package org.pigeon.rpc.mina;
 
+import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.handler.stream.StreamIoHandler;
-
-import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * @author lixiang
  * @version $Id MinaClientHandler.java, v 0.1 2017-09-12 10:19 lixiang Exp $$
  */
-public class MinaClientHandler extends StreamIoHandler {
-
+public class MinaClientHandler extends IoHandlerAdapter {
 
 
     @Override
-    protected void processStreamIo(IoSession session, InputStream in, OutputStream out) {
+    public void messageReceived(IoSession session, Object message) throws Exception {
 
+        System.out.println(message.toString());
 
-
-
-    }
-
-    @Override
-    public void messageReceived(IoSession session, Object buf) {
-        super.messageReceived(session, buf);
     }
 }

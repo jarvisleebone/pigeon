@@ -1,9 +1,13 @@
 package org.pigeon.rpc.mina;
 
 import org.apache.log4j.Logger;
+import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.pigeon.config.handler.ConfigHandler;
 import org.pigeon.model.PigeonRequest;
 import org.pigeon.registry.RegisterHandler;
@@ -14,7 +18,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
 
-public class MinaRpcHandler extends RpcHandler {
+public class MinaRpcHandler implements RpcHandler {
 
     private static final Logger LOGGER = Logger.getLogger(MinaRpcHandler.class);
 
@@ -26,11 +30,11 @@ public class MinaRpcHandler extends RpcHandler {
             acceptor.getSessionConfig().setReadBufferSize(2048);
             acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
             // 设置日志记录器
-            // acceptor.getFilterChain().addLast("logger", new LoggingFilter());
+//             acceptor.getFilterChain().addLast("logger", new LoggingFilter());
             // 设置编码过滤器
-            // acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
+            acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
             // 指定业务逻辑处理器
-            acceptor.setHandler(new MinaServerHandler(ConfigHandler.serializer));
+            acceptor.setHandler(new MinaServerHandler());
             // 设置端口号
             acceptor.bind(new InetSocketAddress(port));
             // 启动监听线程
@@ -45,9 +49,30 @@ public class MinaRpcHandler extends RpcHandler {
         // TODO 通过配置的路由规则选取服务端，然后将request序列化后发送到该服务端，拿到返回值
         Router router = ConfigHandler.router;
         List<String> servers = RegisterHandler.services.get(request.getInterfaceName());
-        String serverAddress = router.elect(servers);
+        String[] serverAddress = router.elect(servers).split(":");
+        String ip = serverAddress[0];
+        int port = Integer.parseInt(serverAddress[1]);
 
+        // 创建客户端连接器
+        NioSocketConnector connector = new NioSocketConnector();
+//        connector.getFilterChain().addLast("logger", new LoggingFilter());
+        connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
 
+        // 设置连接超时检查时间
+        connector.setConnectTimeoutCheckInterval(30);
+        connector.setHandler(new MinaClientHandler());
+
+        // 建立连接
+        ConnectFuture cf = connector.connect(new InetSocketAddress(ip, port));
+        // 等待连接创建完成
+        cf.awaitUninterruptibly();
+
+        cf.getSession().write(request);
+
+        // 等待连接断开
+        cf.getSession().getCloseFuture().awaitUninterruptibly();
+        // 释放连接
+        connector.dispose();
 
         return null;
     }

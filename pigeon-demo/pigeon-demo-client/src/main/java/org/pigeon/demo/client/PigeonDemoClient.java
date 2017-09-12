@@ -13,5 +13,20 @@ public class PigeonDemoClient {
 
         HelloService helloService = applicationContext.getBean(HelloService.class);
         System.out.println(helloService.hello("jarvis"));
+
+
+        /**
+         * 客户端连接池
+         *
+         * 异步发送请求、异步的callback
+         *
+         * 序列化实现
+         *
+         * 心跳
+         *
+         * 路由规则实现
+         *
+         * netty集成
+         */
     }
 }

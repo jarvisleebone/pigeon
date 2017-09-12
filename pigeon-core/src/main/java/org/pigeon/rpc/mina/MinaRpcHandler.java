@@ -49,10 +49,6 @@ public class MinaRpcHandler extends RpcHandler {
 
 
 
-
-
-
-
         return null;
     }
 }

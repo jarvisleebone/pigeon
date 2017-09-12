@@ -11,6 +11,7 @@ public class ClientConfig<T> implements ApplicationListener, FactoryBean<T> {
 
     private String id;
     private Class<T> interfaceClass;
+    private boolean sync;
 
     @Override
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
@@ -31,7 +32,7 @@ public class ClientConfig<T> implements ApplicationListener, FactoryBean<T> {
         return (T) Proxy.newProxyInstance(
                 interfaceClass.getClassLoader(),
                 new Class<?>[]{interfaceClass},
-                new ClientInvocationHandler<>(interfaceClass)
+                new ClientInvocationHandler<>(interfaceClass, sync)
         );
     }
 
@@ -61,4 +62,11 @@ public class ClientConfig<T> implements ApplicationListener, FactoryBean<T> {
         this.interfaceClass = interfaceClass;
     }
 
+    public boolean isSync() {
+        return sync;
+    }
+
+    public void setSync(boolean sync) {
+        this.sync = sync;
+    }
 }

@@ -19,11 +19,12 @@ import java.util.Arrays;
 public class ClientInvocationHandler<T> implements InvocationHandler {
 
     private Class<T> clazz;
-
+    private boolean sync;
     private RpcHandler rpcHandler;
 
-    public ClientInvocationHandler(Class<T> clazz) {
+    public ClientInvocationHandler(Class<T> clazz, boolean sync) {
         this.clazz = clazz;
+        this.sync = sync;
         this.rpcHandler = ConfigHandler.rpcHandler;
     }
 
@@ -32,6 +33,7 @@ public class ClientInvocationHandler<T> implements InvocationHandler {
         PigeonRequest request = new PigeonRequest();
         request.setInterfaceName(clazz.getName());
         request.setMethodName(method.getName());
+        request.setSync(sync);
         if (null != args && 0 != args.length) {
             request.setParameterTypes(Arrays.stream(args).map((arg) -> arg.getClass()).toArray(Class<?>[]::new));
             request.setParameters(args);

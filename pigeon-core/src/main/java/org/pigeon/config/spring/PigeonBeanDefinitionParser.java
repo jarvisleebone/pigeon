@@ -78,6 +78,7 @@ public class PigeonBeanDefinitionParser extends AbstractSingleBeanDefinitionPars
             String interfaceName = element.getAttribute("interface");
             PigeonConfig.clientInterfaceNames.add(interfaceName);
             builder.addPropertyValue("interface", interfaceName);
+            builder.addPropertyValue("sync", element.getAttribute("sync"));
         }
     }
 

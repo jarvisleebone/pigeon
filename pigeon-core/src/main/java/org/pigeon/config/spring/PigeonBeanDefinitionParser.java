@@ -70,7 +70,7 @@ public class PigeonBeanDefinitionParser extends AbstractSingleBeanDefinitionPars
         }
         if (ServiceConfig.class.equals(beanClass)) {
             String interfaceName = element.getAttribute("interface");
-            PigeonConfig.serverInterfaceNames.add(interfaceName);
+            PigeonConfig.serviceInterfaceNames.add(interfaceName);
             builder.addPropertyValue("interface", interfaceName);
             builder.addPropertyValue("ref", new RuntimeBeanReference(element.getAttribute("ref")));
         }

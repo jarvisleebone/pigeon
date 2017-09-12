@@ -1,10 +1,18 @@
 package org.pigeon.config;
 
-public class ServiceConfig<T>{
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+
+public class ServiceConfig<T> implements ApplicationListener {
 
     private String id;
     private T ref;
     private Class<T> interfaceClass;
+
+    @Override
+    public void onApplicationEvent(ApplicationEvent event) {
+        PigeonConfig.serviceConfigs.put(interfaceClass.getName(), this);
+    }
 
     public String getId() {
         return id;

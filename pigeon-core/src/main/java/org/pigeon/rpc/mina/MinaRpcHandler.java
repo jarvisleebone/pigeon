@@ -46,7 +46,6 @@ public class MinaRpcHandler implements RpcHandler {
 
     @Override
     public Object sendMessage(PigeonRequest request) {
-        // TODO 通过配置的路由规则选取服务端，然后将request序列化后发送到该服务端，拿到返回值
         Router router = ConfigHandler.router;
         List<String> servers = RegisterHandler.services.get(request.getInterfaceName());
         String[] serverAddress = router.elect(servers).split(":");

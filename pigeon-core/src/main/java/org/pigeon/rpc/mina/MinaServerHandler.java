@@ -1,28 +1,20 @@
 package org.pigeon.rpc.mina;
 
-import org.apache.log4j.Logger;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
+import org.pigeon.config.PigeonConfig;
+import org.pigeon.config.ServiceConfig;
 import org.pigeon.model.PigeonRequest;
 
+import java.lang.reflect.Method;
 
 public class MinaServerHandler extends IoHandlerAdapter {
-
-    private static final Logger LOGGER = Logger.getLogger(MinaServerHandler.class);
-
-
-    @Override
-    public void sessionCreated(IoSession session) throws Exception {
-        LOGGER.info("session created : " + session.getId());
-    }
 
     @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
         PigeonRequest request = (PigeonRequest) message;
-
-        System.out.println(request.getInterfaceName());
-        System.out.println(request.getMethodName());
-
-        session.write("result");
+        ServiceConfig serviceConfig = PigeonConfig.serviceConfigs.get(request.getInterfaceName());
+        Method method = serviceConfig.getRef().getClass().getMethod(request.getMethodName(), request.getParameterTypes());
+        session.write(method.invoke(serviceConfig.getRef(), request.getParameters()));
     }
 }

@@ -2,27 +2,22 @@ package org.pigeon.rpc;
 
 import org.pigeon.model.PigeonRequest;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public abstract class RpcHandler {
 
-    private static ThreadPoolExecutor threadPoolExecutor;
+    // 执行服务端逻辑的线程池
+    private static ExecutorService fixedThreadPool = Executors.newFixedThreadPool(5);
 
     public abstract void bindService(int port);
 
-    public abstract Object sendMessage(PigeonRequest request);
+    public abstract Object sendMessageSync(PigeonRequest request) throws Exception;
 
-    public static void submit(Runnable task){
-        if(threadPoolExecutor == null){
-            synchronized (RpcHandler.class) {
-                if(threadPoolExecutor == null){
-                    threadPoolExecutor = new ThreadPoolExecutor(16, 16, 600L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(65536));
-                }
-            }
-        }
-        threadPoolExecutor.submit(task);
+    public abstract void sendMessageAsync(PigeonRequest request) throws Exception;
+
+    public static void execute(Runnable task){
+        fixedThreadPool.execute(task);
     }
 
 }

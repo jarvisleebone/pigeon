@@ -15,7 +15,7 @@ public class MinaServerHandler extends IoHandlerAdapter {
 
     @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
-        RpcHandler.submit(() -> {
+        RpcHandler.execute(() -> {
             try {
                 PigeonRequest request = (PigeonRequest) message;
                 ServiceConfig serviceConfig = PigeonConfig.serviceConfigs.get(request.getInterfaceName());

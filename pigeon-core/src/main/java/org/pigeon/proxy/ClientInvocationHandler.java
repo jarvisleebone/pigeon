@@ -38,6 +38,11 @@ public class ClientInvocationHandler<T> implements InvocationHandler {
             request.setParameterTypes(Arrays.stream(args).map((arg) -> arg.getClass()).toArray(Class<?>[]::new));
             request.setParameters(args);
         }
-        return rpcHandler.sendMessage(request);
+        if (sync) {
+            return rpcHandler.sendMessageSync(request);
+        } else {
+            rpcHandler.sendMessageAsync(request);
+            return null;
+        }
     }
 }

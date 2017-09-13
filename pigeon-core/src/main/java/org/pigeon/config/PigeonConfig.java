@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PigeonConfig implements ApplicationListener{
 
-    // 服务端提供的接口配置hash
+    // 服务端提供的接口配置
     public static final Map<String, ServiceConfig> serviceConfigs = new ConcurrentHashMap<>();
     // 服务端提供的接口名字集合
     public static final Set<String> serviceInterfaceNames = new ConcurrentHashSet<>();

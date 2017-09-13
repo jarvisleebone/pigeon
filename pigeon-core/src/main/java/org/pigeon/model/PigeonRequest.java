@@ -9,6 +9,7 @@ public class PigeonRequest implements Serializable {
     private String methodName;
     private Class<?>[] parameterTypes;
     private Object[] parameters;
+    private Class<?> returnType;
     private boolean sync;
 
     public String getInterfaceName() {
@@ -49,5 +50,13 @@ public class PigeonRequest implements Serializable {
 
     public void setSync(boolean sync) {
         this.sync = sync;
+    }
+
+    public Class<?> getReturnType() {
+        return returnType;
+    }
+
+    public void setReturnType(Class<?> returnType) {
+        this.returnType = returnType;
     }
 }

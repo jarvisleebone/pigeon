@@ -46,6 +46,7 @@
                 <xsd:extension base="beans:identifiedType">
                     <xsd:attribute name="interface" type="xsd:string" />
                     <xsd:attribute name="sync" type="xsd:boolean" />
+                    <xsd:attribute name="callback" type="xsd:string" />
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>

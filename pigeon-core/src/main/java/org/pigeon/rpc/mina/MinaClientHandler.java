@@ -6,6 +6,9 @@ package org.pigeon.rpc.mina;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
+import org.pigeon.callback.PigeonCallback;
+
+import java.lang.reflect.Method;
 
 /**
  * @author lixiang
@@ -13,11 +16,15 @@ import org.apache.mina.core.session.IoSession;
  */
 public class MinaClientHandler extends IoHandlerAdapter {
 
+    private PigeonCallback callback;
+
+    public MinaClientHandler(PigeonCallback callback) {
+        this.callback = callback;
+    }
 
     @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
-
-        System.out.println(message.toString());
-
+        Method method = callback.getClass().getMethod("callback", Object.class);
+        method.invoke(callback, message);
     }
 }

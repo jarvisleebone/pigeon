@@ -1,6 +1,8 @@
 package org.pigeon.demo.client;
 
+import org.pigeon.demo.server.model.Person;
 import org.pigeon.demo.server.service.HelloService;
+import org.pigeon.demo.server.service.WorldService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -16,18 +18,42 @@ public class PigeonDemoClient {
         System.out.println("client start");
 
         HelloService helloService = applicationContext.getBean(HelloService.class);
+        WorldService worldService = applicationContext.getBean(WorldService.class);
+
+//        sync(helloService);
+        async(worldService);
+
+        /**
+         * 序列化实现
+         *
+         * 路由规则实现
+         *
+         * 心跳
+         *
+         * netty集成
+         */
+    }
+
+
+    private static void sync(HelloService helloService) {
         // 先调用一次，为了初始化连接
-        System.out.println(helloService.hello("jarvis"));
+//        System.out.println(helloService.hello("world"));
         System.out.println("----------------------");
 
-        long count = 10 * 10000;
+        long count = 1;
         long beginTime = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
-            String str = helloService.hello("test");
+//            String str = helloService.hello("test");
+//            System.out.println(str);
+//            helloService.testVoid("void");
+
 //            fixedThreadPool.execute(() -> {
 //                String str = helloService.hello("test");
 //                System.out.println(str);
 //            });
+
+            Person p = helloService.addAge(new Person("mike", 35));
+            System.out.println(p.getName() + ":" + p.getAge());
         }
         long endTime = System.currentTimeMillis();
 
@@ -36,18 +62,10 @@ public class PigeonDemoClient {
         System.out.println("平均耗时：" + (endTime - beginTime) / (count * 1.00) + "ms");
 
         System.out.println("----------------------");
-
-
-        /**
-         * 异步发送请求、异步的callback
-         *
-         * 序列化实现
-         *
-         * 心跳
-         *
-         * 路由规则实现
-         *
-         * netty集成
-         */
     }
+
+    private static void async(WorldService worldService) {
+        worldService.world("hello");
+    }
+
 }

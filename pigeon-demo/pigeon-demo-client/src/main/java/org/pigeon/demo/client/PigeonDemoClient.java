@@ -4,8 +4,6 @@ import org.pigeon.demo.server.service.HelloService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.util.concurrent.*;
-
 public class PigeonDemoClient {
 
     public static void main(String[] args) {
@@ -26,17 +24,9 @@ public class PigeonDemoClient {
 
         System.out.println("sec:" + (endTime - beginTime) / 1000.00);
         System.out.println("tps:" + count / ((endTime - beginTime) / 1000.00));
-        System.out.println("平均耗时：" + (endTime - beginTime) / (count*1.00) + "ms");
+        System.out.println("平均耗时：" + (endTime - beginTime) / (count * 1.00) + "ms");
 
         System.out.println("----------------------");
-
-
-
-
-
-
-
-
 
 
         /**

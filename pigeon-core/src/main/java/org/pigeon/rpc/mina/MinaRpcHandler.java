@@ -15,7 +15,6 @@ import org.pigeon.model.PigeonRequest;
 import org.pigeon.registry.RegisterHandler;
 import org.pigeon.router.Router;
 import org.pigeon.rpc.RpcHandler;
-import org.springframework.objenesis.Objenesis;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -29,7 +28,7 @@ public class MinaRpcHandler extends RpcHandler {
     private static final Logger LOGGER = Logger.getLogger(MinaRpcHandler.class);
 
     // 客户端持有的与服务端的连接
-    private static Map<String, ConnectFuture> minaConnections = new ConcurrentHashMap<>();
+    private static Map<String, Map<String, ConnectFuture>> minaConnections = new ConcurrentHashMap<>();
 
     @Override
     public void bindService(int port) {
@@ -62,8 +61,15 @@ public class MinaRpcHandler extends RpcHandler {
         String ip = ipPort[0];
         int port = Integer.parseInt(ipPort[1]);
 
-        String connectType = request.isSync() ? "sync" : "async";
-        ConnectFuture cf = minaConnections.get(connectType);
+        if (null == minaConnections.get(serverAddress)) {
+            synchronized (minaConnections) {
+                if (null == minaConnections.get(serverAddress)) {
+                    minaConnections.put(serverAddress, new ConcurrentHashMap<>());
+                }
+            }
+        }
+
+        ConnectFuture cf = minaConnections.get(serverAddress).get("sync");
         if (null == cf) {
             synchronized (MinaRpcHandler.class) {
                 if (null == cf) {
@@ -82,7 +88,7 @@ public class MinaRpcHandler extends RpcHandler {
                     cf = connector.connect(new InetSocketAddress(ip, port));
                     // 等待连接创建完成
                     cf.awaitUninterruptibly();
-                    minaConnections.put(connectType, cf);
+                    minaConnections.get(serverAddress).put("sync", cf);
                 }
             }
         }

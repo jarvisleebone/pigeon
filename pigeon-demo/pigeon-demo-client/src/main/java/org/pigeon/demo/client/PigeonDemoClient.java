@@ -4,7 +4,12 @@ import org.pigeon.demo.server.service.HelloService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class PigeonDemoClient {
+
+    private static ExecutorService fixedThreadPool = Executors.newFixedThreadPool(10);
 
     public static void main(String[] args) {
         ApplicationContext applicationContext = new ClassPathXmlApplicationContext(new String[]{"spring/spring.xml"});
@@ -15,10 +20,14 @@ public class PigeonDemoClient {
         System.out.println(helloService.hello("jarvis"));
         System.out.println("----------------------");
 
-        long count = 1 * 10000;
+        long count = 10 * 10000;
         long beginTime = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
-            helloService.hello("test");
+            String str = helloService.hello("test");
+//            fixedThreadPool.execute(() -> {
+//                String str = helloService.hello("test");
+//                System.out.println(str);
+//            });
         }
         long endTime = System.currentTimeMillis();
 

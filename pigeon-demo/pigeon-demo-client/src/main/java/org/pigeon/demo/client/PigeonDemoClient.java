@@ -17,7 +17,7 @@ public class PigeonDemoClient {
         System.out.println(helloService.hello("jarvis"));
         System.out.println("----------------------");
 
-        long count = 100 * 10000;
+        long count = 1 * 10000;
         long beginTime = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
             helloService.hello("test");

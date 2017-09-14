@@ -68,6 +68,14 @@ public class MinaRpcHandler extends RpcHandler {
 
     @Override
     public void sendMessageAsync(PigeonRequest request, String serverAddress, PigeonCallback callback) throws Exception {
+        // TODO 这里有bug，不能把接口的callback实现直接放到连接里
+        /**
+         * TODO
+         * 封装一个response对象，通过requestId跟request对象关联
+         * 这里的callback实现放到全局的map里，key未requestid，value为callback实现
+         * 接到异步响应后，从response中拿到requestid，找到对应的callback实现并反射执行
+         */
+
         // 初始化连接
         initConn(request, serverAddress, callback);
         // 获取连接
@@ -100,7 +108,6 @@ public class MinaRpcHandler extends RpcHandler {
                     // 创建客户端连接器
                     NioSocketConnector connector = new NioSocketConnector();
                     connector.getFilterChain().addLast("logger", new LoggingFilter());
-                    // TODO 需要根据配置决定序列化实现
                     connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
                     // 设置连接超时检查时间
                     connector.setConnectTimeoutCheckInterval(30);

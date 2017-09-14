@@ -20,8 +20,8 @@ public class PigeonDemoClient {
         HelloService helloService = applicationContext.getBean(HelloService.class);
         WorldService worldService = applicationContext.getBean(WorldService.class);
 
-//        sync(helloService);
-        async(worldService);
+        sync(helloService);
+//        async(worldService);
 
         /**
          * 序列化实现
@@ -37,7 +37,7 @@ public class PigeonDemoClient {
 
     private static void sync(HelloService helloService) {
         // 先调用一次，为了初始化连接
-//        System.out.println(helloService.hello("world"));
+        System.out.println(helloService.hello("world"));
         System.out.println("----------------------");
 
         long count = 1;

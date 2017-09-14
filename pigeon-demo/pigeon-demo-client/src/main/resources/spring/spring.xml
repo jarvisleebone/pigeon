@@ -8,13 +8,17 @@
        http://pigeon.org/schema/pigeon
        http://pigeon.org/schema/pigeon.xsd">
 
-    <pigeon:config id="config" protocol="mina" route="random" />
+    <pigeon:config id="config" protocol="mina" route="random" serializer="protostuff" />
 
-    <!--<pigeon:registry id="registry" protocol="zookeeper" address="192.168.0.113" port="2181" />-->
-    <pigeon:registry id="registry" protocol="zookeeper" address="192.168.216.129" port="2181" />
+    <pigeon:registry id="registry" protocol="zookeeper" address="192.168.0.114" port="2181" />
+    <!--<pigeon:registry id="registry" protocol="zookeeper" address="192.168.216.129" port="2181" />-->
 
-    <pigeon:client id="helloService" interface="org.pigeon.demo.server.service.HelloService" sync="true" />
-    <pigeon:client id="worldService" interface="org.pigeon.demo.server.service.WorldService" sync="false" callback="worldServiceCallback" />
+    <pigeon:client id="helloService" interface="org.pigeon.demo.server.service.HelloService" sync="true">
+        <pigeon:method id="hello" name="hello" sync="true" callback="" />
+    </pigeon:client>
+    <pigeon:client id="worldService" interface="org.pigeon.demo.server.service.WorldService" sync="true">
+        <pigeon:method id="world" name="world" sync="false" callback="worldServiceCallback" />
+    </pigeon:client>
 
     <bean id="worldServiceCallback" class="org.pigeon.demo.client.callback.WorldServiceCallback" />
 

@@ -2,6 +2,7 @@ package org.pigeon.config;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.mina.util.ConcurrentHashSet;
+import org.pigeon.callback.PigeonCallback;
 import org.pigeon.config.handler.ConfigHandler;
 import org.pigeon.registry.RegisterHandler;
 import org.pigeon.rpc.RpcHandler;
@@ -18,8 +19,8 @@ public class PigeonConfig implements ApplicationListener{
     public static final Map<String, ServiceConfig> serviceConfigs = new ConcurrentHashMap<>();
     // 服务端提供的接口名字集合
     public static final Set<String> serviceInterfaceNames = new ConcurrentHashSet<>();
-    // 客户端使用的接口名字集合
-    public static final Set<String> clientInterfaceNames = new ConcurrentHashSet<>();
+    // 客户端使用的接口集合
+    public static final Map<String, String> clientInterfaces = new ConcurrentHashMap<>();
     private String id;
     private String address;
     private int port;
@@ -38,8 +39,8 @@ public class PigeonConfig implements ApplicationListener{
             // 注册服务
             registerHandler.registerService(address + ":" + port, serviceInterfaceNames);
         }
-        if (0 != clientInterfaceNames.size()) {
-            registerHandler.loadServices(clientInterfaceNames);
+        if (0 != clientInterfaces.size()) {
+            registerHandler.loadServices(clientInterfaces.keySet());
         }
     }
 

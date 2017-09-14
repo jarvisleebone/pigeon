@@ -7,7 +7,8 @@ import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
-import org.apache.mina.filter.logging.LoggingFilter;
+import org.apache.mina.filter.executor.ExecutorFilter;
+import org.apache.mina.filter.executor.UnorderedThreadPoolExecutor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.pigeon.callback.PigeonCallback;
@@ -38,6 +39,7 @@ public class MinaRpcHandler extends RpcHandler {
 //             acceptor.getFilterChain().addLast("logger", new LoggingFilter());
             // 设置编码过滤器
             acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
+//            acceptor.getFilterChain().addLast("exec", new ExecutorFilter(new UnorderedThreadPoolExecutor()));
             // 指定业务逻辑处理器
             acceptor.setHandler(new MinaServerHandler());
             // 设置端口号
@@ -69,13 +71,6 @@ public class MinaRpcHandler extends RpcHandler {
     @Override
     public void sendMessageAsync(PigeonRequest request, String serverAddress, PigeonCallback callback) throws Exception {
         // TODO 这里有bug，不能把接口的callback实现直接放到连接里
-        /**
-         * TODO
-         * 封装一个response对象，通过requestId跟request对象关联
-         * 这里的callback实现放到全局的map里，key未requestid，value为callback实现
-         * 接到异步响应后，从response中拿到requestid，找到对应的callback实现并反射执行
-         */
-
         // 初始化连接
         initConn(request, serverAddress, callback);
         // 获取连接
@@ -102,13 +97,14 @@ public class MinaRpcHandler extends RpcHandler {
         String connType = request.isSync() ? "sync" : "async";
         ConnectFuture cf = minaConnections.get(serverAddress).get(connType);
         if (null == cf) {
-            synchronized (MinaRpcHandler.class) {
-                if (null == cf) {
+            synchronized (minaConnections) {
+                if (null == cf) {/**/
                     String[] ipPort = serverAddress.split(":");
                     // 创建客户端连接器
                     NioSocketConnector connector = new NioSocketConnector();
-                    connector.getFilterChain().addLast("logger", new LoggingFilter());
+//                    connector.getFilterChain().addLast("logger", new LoggingFilter());
                     connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
+//                    connector.getFilterChain().addLast("exec", new ExecutorFilter(new UnorderedThreadPoolExecutor()));
                     // 设置连接超时检查时间
                     connector.setConnectTimeoutCheckInterval(30);
                     if (request.isSync()) connector.getSessionConfig().setUseReadOperation(true); // 同步连接

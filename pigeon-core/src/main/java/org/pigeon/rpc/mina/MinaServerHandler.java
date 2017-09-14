@@ -9,7 +9,6 @@ import org.pigeon.rpc.RpcHandler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class MinaServerHandler extends IoHandlerAdapter {
 
@@ -34,4 +33,5 @@ public class MinaServerHandler extends IoHandlerAdapter {
             }
         });
     }
+
 }

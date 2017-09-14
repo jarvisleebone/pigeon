@@ -25,6 +25,6 @@ public class MinaClientHandler extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
         Method method = callback.getClass().getMethod("callback", Object.class);
-        method.invoke(callback, message);
+        method.invoke(callback, message);/**/
     }
 }

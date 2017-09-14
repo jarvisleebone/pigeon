@@ -40,15 +40,35 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
+
     <xsd:element name="client">
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="beans:identifiedType">
-                    <xsd:attribute name="interface" type="xsd:string" />
-                    <xsd:attribute name="sync" type="xsd:boolean" />
-                    <xsd:attribute name="callback" type="xsd:string" />
+                    <xsd:group ref="methodGroup" minOccurs="0"/>
+                    <xsd:attributeGroup ref="clientAttributes"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
+    <xsd:group name="methodGroup">
+        <xsd:sequence>
+            <xsd:element name="method">
+                <xsd:complexType>
+                    <xsd:complexContent>
+                        <xsd:extension base="beans:identifiedType">
+                            <xsd:attribute name="name" type="xsd:string" />
+                            <xsd:attribute name="sync" type="xsd:boolean" />
+                            <xsd:attribute name="callback" type="xsd:string" />
+                        </xsd:extension>
+                    </xsd:complexContent>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:group>
+    <xsd:attributeGroup name="clientAttributes">
+        <xsd:attribute name="interface" type="xsd:string" />
+        <xsd:attribute name="sync" type="xsd:boolean" />
+        <xsd:attribute name="callback" type="xsd:string" />
+    </xsd:attributeGroup>
 </xsd:schema>

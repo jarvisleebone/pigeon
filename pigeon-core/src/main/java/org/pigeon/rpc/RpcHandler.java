@@ -17,7 +17,7 @@ public abstract class RpcHandler {
 
     public abstract void sendMessageAsync(PigeonRequest request, String serverAddress, PigeonCallback callback) throws Exception;
 
-    public static void execute(Runnable task){
+    public static void execute(Runnable task) {
         fixedThreadPool.execute(task);
     }
 

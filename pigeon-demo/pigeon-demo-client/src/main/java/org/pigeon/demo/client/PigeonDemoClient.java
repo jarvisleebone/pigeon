@@ -25,16 +25,6 @@ public class PigeonDemoClient {
 
 //        async(worldService);
         sync(helloService, 100 * 10000);
-
-        /**
-         * 序列化实现
-         *
-         * 路由规则实现
-         *
-         * 心跳
-         *
-         * netty集成
-         */
     }
 
     private static void sync(HelloService helloService, int count) {

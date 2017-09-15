@@ -33,6 +33,9 @@ public class ClientInvocationHandler<T> implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        // TODO 本地方法调用
+
+
         // 封装请求
         PigeonRequest request = new PigeonRequest();
         request.setInterfaceName(clazz.getName());

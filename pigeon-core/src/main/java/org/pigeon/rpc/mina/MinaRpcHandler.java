@@ -79,7 +79,7 @@ public class MinaRpcHandler extends RpcHandler {
     }
 
     /**
-     * 初始化连接，如果当前客户端不持有对该服务端的连接，则创建一个长连接
+     * 初始化连接，如果当前客户端未持有对该服务端的连接，则创建一个长连接
      *
      * @param request
      * @param serverAddress

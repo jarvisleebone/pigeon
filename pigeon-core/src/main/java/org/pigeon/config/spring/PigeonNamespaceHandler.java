@@ -1,9 +1,6 @@
 package org.pigeon.config.spring;
 
-import org.pigeon.config.ClientConfig;
-import org.pigeon.config.PigeonConfig;
-import org.pigeon.config.RegistryConfig;
-import org.pigeon.config.ServiceConfig;
+import org.pigeon.config.*;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 public class PigeonNamespaceHandler extends NamespaceHandlerSupport {
@@ -12,5 +9,6 @@ public class PigeonNamespaceHandler extends NamespaceHandlerSupport {
         registerBeanDefinitionParser("registry", new PigeonBeanDefinitionParser(RegistryConfig.class));
         registerBeanDefinitionParser("config", new PigeonBeanDefinitionParser(PigeonConfig.class));
         registerBeanDefinitionParser("service", new PigeonBeanDefinitionParser(ServiceConfig.class));
+
     }
 }

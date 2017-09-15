@@ -20,7 +20,10 @@ public class PigeonConfig implements ApplicationListener{
     // 服务端提供的接口名字集合
     public static final Set<String> serviceInterfaceNames = new ConcurrentHashSet<>();
     // 客户端使用的接口集合
-    public static final Map<String, String> clientInterfaces = new ConcurrentHashMap<>();
+    public static final Set<String> clientInterfaceNames = new ConcurrentHashSet<>();
+    // 客户端所有Method配置集合
+    public static final Map<String, MethodConfig> methodConfigs = new ConcurrentHashMap<>();
+
     private String id;
     private String address;
     private int port;
@@ -39,8 +42,8 @@ public class PigeonConfig implements ApplicationListener{
             // 注册服务
             registerHandler.registerService(address + ":" + port, serviceInterfaceNames);
         }
-        if (0 != clientInterfaces.size()) {
-            registerHandler.loadServices(clientInterfaces.keySet());
+        if (0 != clientInterfaceNames.size()) {
+            registerHandler.loadServices(clientInterfaceNames);
         }
     }
 

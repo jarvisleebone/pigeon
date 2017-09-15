@@ -6,20 +6,21 @@ import org.pigeon.common.enums.RegistryProtocolEnum;
 import org.pigeon.common.enums.RouteProtocolEnum;
 import org.pigeon.common.enums.RpcProtocolEnum;
 import org.pigeon.common.enums.SerializerProtocolEnum;
-import org.pigeon.config.ClientConfig;
-import org.pigeon.config.PigeonConfig;
-import org.pigeon.config.RegistryConfig;
-import org.pigeon.config.ServiceConfig;
+import org.pigeon.config.*;
 import org.pigeon.config.handler.ConfigHandler;
 import org.pigeon.registry.RegisterHandlerFactory;
 import org.pigeon.router.RouterFactory;
 import org.pigeon.rpc.RpcHandlerFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
+import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.beans.factory.xml.BeanDefinitionParser;
+import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
-public class PigeonBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
+public class PigeonBeanDefinitionParser implements BeanDefinitionParser {
 
     private final Class<?> beanClass;
 
@@ -27,9 +28,14 @@ public class PigeonBeanDefinitionParser extends AbstractSingleBeanDefinitionPars
         this.beanClass = beanClass;
     }
 
-    @Override
-    protected void doParse(Element element, BeanDefinitionBuilder builder) {
-        builder.addPropertyValue("id", element.getAttribute("id"));
+    private BeanDefinition parse(Element element, ParserContext parserContext, Class<?> beanClass, String clientInterface) {
+        RootBeanDefinition beanDefinition = new RootBeanDefinition();
+        beanDefinition.setBeanClass(beanClass);
+        beanDefinition.setLazyInit(false);
+
+        String id = element.getAttribute("id");
+        parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
+        beanDefinition.getPropertyValues().addPropertyValue("id", id);
         if (PigeonConfig.class.equals(beanClass)) {
             String address = element.getAttribute("address");
             String port = element.getAttribute("port");
@@ -45,12 +51,12 @@ public class PigeonBeanDefinitionParser extends AbstractSingleBeanDefinitionPars
                 route = RouteProtocolEnum.RANDOM.toString();
 
             if (StringUtils.isNotEmpty(address) && StringUtils.isNotEmpty(port)) {
-                builder.addPropertyValue("address", element.getAttribute("address"));
-                builder.addPropertyValue("port", element.getAttribute("port"));
+                beanDefinition.getPropertyValues().addPropertyValue("address", element.getAttribute("address"));
+                beanDefinition.getPropertyValues().addPropertyValue("port", element.getAttribute("port"));
             }
-            builder.addPropertyValue("protocol", protocol);
-            builder.addPropertyValue("serializer", serializer);
-            builder.addPropertyValue("route", route);
+            beanDefinition.getPropertyValues().addPropertyValue("protocol", protocol);
+            beanDefinition.getPropertyValues().addPropertyValue("serializer", serializer);
+            beanDefinition.getPropertyValues().addPropertyValue("route", route);
 
             ConfigHandler.rpcHandler = RpcHandlerFactory.getRpcHandler(protocol);
             ConfigHandler.serializer = SerializerFactory.getSerializer(serializer);
@@ -63,36 +69,47 @@ public class PigeonBeanDefinitionParser extends AbstractSingleBeanDefinitionPars
             if (StringUtils.isEmpty(protocol))
                 protocol = RegistryProtocolEnum.ZOOKEEPER.toString();
 
-            builder.addPropertyValue("address", address);
-            builder.addPropertyValue("port", port);
-            builder.addPropertyValue("protocol", protocol);
+            beanDefinition.getPropertyValues().addPropertyValue("address", address);
+            beanDefinition.getPropertyValues().addPropertyValue("port", port);
+            beanDefinition.getPropertyValues().addPropertyValue("protocol", protocol);
             ConfigHandler.registerHandler = RegisterHandlerFactory.getRegisterHandler(protocol, address, port);
         }
         if (ServiceConfig.class.equals(beanClass)) {
             String interfaceName = element.getAttribute("interface");
             PigeonConfig.serviceInterfaceNames.add(interfaceName);
-            builder.addPropertyValue("interface", interfaceName);
-            builder.addPropertyValue("ref", new RuntimeBeanReference(element.getAttribute("ref")));
+            beanDefinition.getPropertyValues().addPropertyValue("interface", interfaceName);
+            beanDefinition.getPropertyValues().addPropertyValue("ref", new RuntimeBeanReference(element.getAttribute("ref")));
         }
         if (ClientConfig.class.equals(beanClass)) {
             String interfaceName = element.getAttribute("interface");
-            String sync = element.getAttribute("sync");
-            String callback = element.getAttribute("callback");
-
-            builder.addPropertyValue("interface", interfaceName);
-            builder.addPropertyValue("sync", sync);
-            if ("false".equals(sync)) {
-                builder.addPropertyValue("callback", new RuntimeBeanReference(callback));
-                PigeonConfig.clientInterfaces.put(interfaceName, callback);
-            } else {
-                PigeonConfig.clientInterfaces.put(interfaceName, "");
+            beanDefinition.getPropertyValues().addPropertyValue("interface", interfaceName);
+            // 解析method配置
+            NodeList methods = element.getChildNodes();
+            if (null != methods && 0 != methods.getLength()) {
+                for (int i = 0; i < methods.getLength(); i++) {
+                    Node node = methods.item(i);
+                    if (node instanceof Element) {
+                        Element method = (Element) methods.item(i);
+                        parse(method, parserContext, MethodConfig.class, interfaceName);
+                    }
+                }
             }
+            PigeonConfig.clientInterfaceNames.add(interfaceName);
         }
+        if (MethodConfig.class.equals(beanClass)) {
+            beanDefinition.getPropertyValues().add("interfaceName", clientInterface);
+            beanDefinition.getPropertyValues().add("name", element.getAttribute("name"));
+            beanDefinition.getPropertyValues().add("sync", element.getAttribute("sync"));
+            String callback = element.getAttribute("callback");
+            if (StringUtils.isNotEmpty(callback))
+                beanDefinition.getPropertyValues().add("callback", new RuntimeBeanReference(callback));
+        }
+
+        return beanDefinition;
     }
 
     @Override
-    protected Class<?> getBeanClass(Element element) {
-        return beanClass;
+    public BeanDefinition parse(Element element, ParserContext parserContext) {
+        return parse(element, parserContext, beanClass, "");
     }
-
 }

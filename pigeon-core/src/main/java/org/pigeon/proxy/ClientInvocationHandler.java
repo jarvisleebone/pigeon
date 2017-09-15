@@ -4,7 +4,8 @@
  */
 package org.pigeon.proxy;
 
-import org.pigeon.callback.PigeonCallback;
+import org.pigeon.config.MethodConfig;
+import org.pigeon.config.PigeonConfig;
 import org.pigeon.config.handler.ConfigHandler;
 import org.pigeon.model.PigeonRequest;
 import org.pigeon.registry.RegisterHandler;
@@ -23,15 +24,11 @@ import java.util.List;
 public class ClientInvocationHandler<T> implements InvocationHandler {
 
     private Class<T> clazz;
-    private boolean sync;
-    private PigeonCallback callback;
     private RpcHandler rpcHandler;
 
-    public ClientInvocationHandler(Class<T> clazz, boolean sync, PigeonCallback callback) {
+    public ClientInvocationHandler(Class<T> clazz) {
         this.clazz = clazz;
-        this.sync = sync;
         this.rpcHandler = ConfigHandler.rpcHandler;
-        this.callback = callback;
     }
 
     @Override
@@ -40,21 +37,24 @@ public class ClientInvocationHandler<T> implements InvocationHandler {
         PigeonRequest request = new PigeonRequest();
         request.setInterfaceName(clazz.getName());
         request.setMethodName(method.getName());
-        request.setSync(sync);
         request.setReturnType(method.getReturnType());
         if (null != args && 0 != args.length) {
             request.setParameterTypes(Arrays.stream(args).map((arg) -> arg.getClass()).toArray(Class<?>[]::new));
             request.setParameters(args);
         }
+        // 获取method配置 TODO 目前不支持方法重载的情况
+        MethodConfig methodConfig = PigeonConfig.methodConfigs.get(clazz.getName() + method.getName());
+        if (null == methodConfig) request.setSync(true);
+        else request.setSync(methodConfig.isSync());
         // 服务选举
         Router router = ConfigHandler.router;
         List<String> servers = RegisterHandler.services.get(request.getInterfaceName());
         String serverAddress = router.elect(servers);
         // 发送请求
-        if (sync) {
+        if (request.isSync()) {
             return rpcHandler.sendMessageSync(request, serverAddress);
         } else {
-            rpcHandler.sendMessageAsync(request, serverAddress, callback);
+            rpcHandler.sendMessageAsync(request, serverAddress);
             return null;
         }
     }

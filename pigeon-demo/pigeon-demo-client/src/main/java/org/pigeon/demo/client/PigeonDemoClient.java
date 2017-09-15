@@ -1,6 +1,5 @@
 package org.pigeon.demo.client;
 
-import org.pigeon.demo.server.model.Person;
 import org.pigeon.demo.server.service.HelloService;
 import org.pigeon.demo.server.service.WorldService;
 import org.springframework.context.ApplicationContext;
@@ -22,15 +21,12 @@ public class PigeonDemoClient {
         WorldService worldService = applicationContext.getBean(WorldService.class);
         helloService.testVoid("void");
         worldService.world("hello");
+//        System.out.println(helloService.hello("哈哈哈哈哈哈哈哈"));
 
 //        async(worldService);
         sync(helloService, 100 * 10000);
 
         /**
-         * 同步异步控制在方法层
-         * 异步callback
-         *
-         *
          * 序列化实现
          *
          * 路由规则实现
@@ -48,7 +44,7 @@ public class PigeonDemoClient {
 
         long beginTime = System.currentTimeMillis();
 
-        for (int i = 0; i < count; i ++) {
+        for (int i = 0; i < count; i++) {
             fixedThreadPool.execute(() -> {
                 String str = helloService.hello("test");
                 countDown.countDown();
@@ -67,7 +63,6 @@ public class PigeonDemoClient {
         System.out.println("qps:" + count / ((endTime - beginTime) / 1000.00));
         System.out.println("平均耗时：" + (endTime - beginTime) / (count * 1.00) + "ms");
     }
-
 
 
     private static void async(WorldService worldService) {

@@ -68,7 +68,5 @@
     </xsd:group>
     <xsd:attributeGroup name="clientAttributes">
         <xsd:attribute name="interface" type="xsd:string" />
-        <xsd:attribute name="sync" type="xsd:boolean" />
-        <xsd:attribute name="callback" type="xsd:string" />
     </xsd:attributeGroup>
 </xsd:schema>

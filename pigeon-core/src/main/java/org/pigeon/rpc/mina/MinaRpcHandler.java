@@ -7,11 +7,8 @@ import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
-import org.apache.mina.filter.executor.ExecutorFilter;
-import org.apache.mina.filter.executor.UnorderedThreadPoolExecutor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.pigeon.callback.PigeonCallback;
 import org.pigeon.model.PigeonRequest;
 import org.pigeon.rpc.RpcHandler;
 
@@ -54,7 +51,7 @@ public class MinaRpcHandler extends RpcHandler {
     @Override
     public Object sendMessageSync(PigeonRequest request, String serverAddress) throws Exception {
         // 初始化连接
-        initConn(request, serverAddress, null);
+        initConn(request, serverAddress);
         // 获取连接
         ConnectFuture cf = minaConnections.get(serverAddress).get("sync");
         // 请求发送到服务端
@@ -64,15 +61,17 @@ public class MinaRpcHandler extends RpcHandler {
         // 读取接口返回值
         ReadFuture readFuture = cf.getSession().read();
         // 是否超时
-        if (readFuture.awaitUninterruptibly(10, TimeUnit.SECONDS)) return readFuture.getMessage();
-        else throw new Exception("time out");
+        if (readFuture.awaitUninterruptibly(10, TimeUnit.SECONDS)) {
+            return readFuture.getMessage();
+        } else {
+            throw new Exception("time out");
+        }
     }
 
     @Override
-    public void sendMessageAsync(PigeonRequest request, String serverAddress, PigeonCallback callback) throws Exception {
-        // TODO 这里有bug，不能把接口的callback实现直接放到连接里
+    public void sendMessageAsync(PigeonRequest request, String serverAddress) throws Exception {
         // 初始化连接
-        initConn(request, serverAddress, callback);
+        initConn(request, serverAddress);
         // 获取连接
         ConnectFuture cf = minaConnections.get(serverAddress).get("async");
         // 请求发送到服务端
@@ -85,7 +84,7 @@ public class MinaRpcHandler extends RpcHandler {
      * @param request
      * @param serverAddress
      */
-    private void initConn(PigeonRequest request, String serverAddress, PigeonCallback callback) {
+    private void initConn(PigeonRequest request, String serverAddress) {
         if (null == minaConnections.get(serverAddress)) {
             synchronized (minaConnections) {
                 if (null == minaConnections.get(serverAddress)) {
@@ -98,7 +97,7 @@ public class MinaRpcHandler extends RpcHandler {
         ConnectFuture cf = minaConnections.get(serverAddress).get(connType);
         if (null == cf) {
             synchronized (minaConnections) {
-                if (null == cf) {/**/
+                if (null == cf) {
                     String[] ipPort = serverAddress.split(":");
                     // 创建客户端连接器
                     NioSocketConnector connector = new NioSocketConnector();
@@ -108,7 +107,7 @@ public class MinaRpcHandler extends RpcHandler {
                     // 设置连接超时检查时间
                     connector.setConnectTimeoutCheckInterval(30);
                     if (request.isSync()) connector.getSessionConfig().setUseReadOperation(true); // 同步连接
-                    else connector.setHandler(new MinaClientHandler(callback)); // 异步连接
+                    else connector.setHandler(new MinaClientHandler()); // 异步连接
                     // 创建连接
                     cf = connector.connect(new InetSocketAddress(ipPort[0], Integer.parseInt(ipPort[1])));
                     // 等待连接创建完成

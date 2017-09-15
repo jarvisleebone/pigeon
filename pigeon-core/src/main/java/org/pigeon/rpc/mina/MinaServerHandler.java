@@ -5,6 +5,7 @@ import org.apache.mina.core.session.IoSession;
 import org.pigeon.config.PigeonConfig;
 import org.pigeon.config.ServiceConfig;
 import org.pigeon.model.PigeonRequest;
+import org.pigeon.model.PigeonResponse;
 import org.pigeon.rpc.RpcHandler;
 
 import java.lang.reflect.InvocationTargetException;
@@ -20,10 +21,19 @@ public class MinaServerHandler extends IoHandlerAdapter {
                 ServiceConfig serviceConfig = PigeonConfig.serviceConfigs.get(request.getInterfaceName());
                 Method method = serviceConfig.getRef().getClass().getMethod(request.getMethodName(), request.getParameterTypes());
 
-                if ("void".equals(method.getReturnType().getName()))
+                if ("void".equals(method.getReturnType().getName())) {
                     method.invoke(serviceConfig.getRef(), request.getParameters());
-                else
-                    session.write(method.invoke(serviceConfig.getRef(), request.getParameters()));
+                } else {
+                    if (request.isSync()) {
+                        session.write(method.invoke(serviceConfig.getRef(), request.getParameters()));
+                    } else {
+                        PigeonResponse response = new PigeonResponse();
+                        response.setInterfaceName(request.getInterfaceName());
+                        response.setMethodName(request.getMethodName());
+                        response.setResult(method.invoke(serviceConfig.getRef(), request.getParameters()));
+                        session.write(response);
+                    }
+                }
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {

@@ -1,20 +1,18 @@
 package org.pigeon.config;
 
-import org.pigeon.callback.PigeonCallback;
 import org.pigeon.proxy.ClientInvocationHandler;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ClientConfig<T> implements ApplicationListener, FactoryBean<T> {
 
     private String id;
     private Class<T> interfaceClass;
-    private boolean sync;
-    private PigeonCallback callback;
-
     @Override
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
         try {
@@ -34,7 +32,7 @@ public class ClientConfig<T> implements ApplicationListener, FactoryBean<T> {
         return (T) Proxy.newProxyInstance(
                 interfaceClass.getClassLoader(),
                 new Class<?>[]{interfaceClass},
-                new ClientInvocationHandler<>(interfaceClass, sync, callback)
+                new ClientInvocationHandler<>(interfaceClass)
         );
     }
 
@@ -64,19 +62,4 @@ public class ClientConfig<T> implements ApplicationListener, FactoryBean<T> {
         this.interfaceClass = interfaceClass;
     }
 
-    public boolean isSync() {
-        return sync;
-    }
-
-    public void setSync(boolean sync) {
-        this.sync = sync;
-    }
-
-    public PigeonCallback getCallback() {
-        return callback;
-    }
-
-    public void setCallback(PigeonCallback callback) {
-        this.callback = callback;
-    }
 }

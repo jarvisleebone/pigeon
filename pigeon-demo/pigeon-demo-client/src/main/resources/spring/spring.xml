@@ -14,7 +14,9 @@
     <!--<pigeon:registry id="registry" protocol="zookeeper" address="192.168.216.129" port="2181" />-->
 
     <pigeon:client id="helloService" interface="org.pigeon.demo.server.service.HelloService">
-        <pigeon:method id="hello" name="hello" sync="true" />
+        <pigeon:method id="hello" name="hello" sync="true">
+            <pigeon:paramter type="java.lang.String" />
+        </pigeon:method>
     </pigeon:client>
     <pigeon:client id="worldService" interface="org.pigeon.demo.server.service.WorldService">
         <pigeon:method id="world" name="world" sync="false" callback="worldServiceCallback" />

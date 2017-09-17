@@ -5,6 +5,7 @@
 package org.pigeon.proxy;
 
 import org.pigeon.common.util.EncryptUtil;
+import org.pigeon.common.util.ReflectUtil;
 import org.pigeon.config.MethodConfig;
 import org.pigeon.config.PigeonConfig;
 import org.pigeon.config.handler.ConfigHandler;
@@ -39,7 +40,7 @@ public class ClientInvocationHandler<T> implements InvocationHandler {
 
         // 封装请求
         PigeonRequest request = new PigeonRequest();
-        String methodSign = EncryptUtil.md532(clazz.getName() + method.getName());
+        String methodSign = ReflectUtil.getMethodSign(clazz, method);
         request.setInterfaceName(clazz.getName());
         request.setMethodSign(methodSign);
         request.setReturnType(method.getReturnType());

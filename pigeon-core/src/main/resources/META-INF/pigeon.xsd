@@ -57,6 +57,7 @@
                 <xsd:complexType>
                     <xsd:complexContent>
                         <xsd:extension base="beans:identifiedType">
+                            <xsd:group ref="paramterGroup" minOccurs="0"/>
                             <xsd:attribute name="name" type="xsd:string" />
                             <xsd:attribute name="sync" type="xsd:boolean" />
                             <xsd:attribute name="callback" type="xsd:string" />
@@ -69,4 +70,18 @@
     <xsd:attributeGroup name="clientAttributes">
         <xsd:attribute name="interface" type="xsd:string" />
     </xsd:attributeGroup>
+
+    <xsd:group name="paramterGroup">
+        <xsd:sequence>
+            <xsd:element name="paramter">
+                <xsd:complexType>
+                    <xsd:complexContent>
+                        <xsd:extension base="beans:listOrSetType">
+                            <xsd:attribute name="type" type="xsd:string" />
+                        </xsd:extension>
+                    </xsd:complexContent>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:group>
 </xsd:schema>

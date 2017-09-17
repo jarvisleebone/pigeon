@@ -10,6 +10,9 @@ package org.pigeon.common.enums;
  */
 public enum RouteProtocolEnum {
 
-    RANDOM
+    RANDOM,
+    RR,
+    WRR
+
 
 }

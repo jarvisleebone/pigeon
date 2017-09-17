@@ -9,6 +9,7 @@ import org.pigeon.rpc.RpcHandler;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,6 +20,8 @@ public class PigeonConfig implements ApplicationListener{
     public static final Map<String, ServiceConfig> serviceConfigs = new ConcurrentHashMap<>();
     // 服务端提供的接口名字集合
     public static final Set<String> serviceInterfaceNames = new ConcurrentHashSet<>();
+    // 服务端提供的所有方法实现集合
+    public static final Map<String, Method> serviceMethods = new ConcurrentHashMap<>();
     // 客户端使用的接口集合
     public static final Set<String> clientInterfaceNames = new ConcurrentHashSet<>();
     // 客户端所有Method配置集合

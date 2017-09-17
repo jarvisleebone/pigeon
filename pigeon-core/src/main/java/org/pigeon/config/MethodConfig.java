@@ -5,6 +5,7 @@
 package org.pigeon.config;
 
 import org.pigeon.callback.PigeonCallback;
+import org.pigeon.common.util.EncryptUtil;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
@@ -22,7 +23,8 @@ public class MethodConfig implements ApplicationListener {
 
     @Override
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
-        PigeonConfig.methodConfigs.put(interfaceName + name, this);
+        String methodSign = EncryptUtil.md532(interfaceName + name);
+        PigeonConfig.methodConfigs.put(methodSign, this);
     }
 
     /**

@@ -19,7 +19,7 @@ public class MinaClientHandler extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
         PigeonResponse response = (PigeonResponse) message;
-        MethodConfig methodConfig = PigeonConfig.methodConfigs.get(response.getInterfaceName() + response.getMethodName());
+        MethodConfig methodConfig = PigeonConfig.methodConfigs.get(response.getMethodSign());
         if (null != methodConfig.getCallback()) {
             methodConfig.getCallback().callback(response.getResult());
         }

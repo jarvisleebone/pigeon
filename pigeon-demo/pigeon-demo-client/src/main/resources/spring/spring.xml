@@ -10,8 +10,8 @@
 
     <pigeon:config id="config" protocol="mina" route="random" serializer="protostuff" />
 
-    <!--<pigeon:registry id="registry" protocol="zookeeper" address="192.168.0.114" port="2181" />-->
-    <pigeon:registry id="registry" protocol="zookeeper" address="192.168.216.129" port="2181" />
+    <pigeon:registry id="registry" protocol="zookeeper" address="192.168.0.114" port="2181" />
+    <!--<pigeon:registry id="registry" protocol="zookeeper" address="192.168.216.129" port="2181" />-->
 
     <pigeon:client id="helloService" interface="org.pigeon.demo.server.service.HelloService">
         <pigeon:method id="hello" name="hello" sync="true" />

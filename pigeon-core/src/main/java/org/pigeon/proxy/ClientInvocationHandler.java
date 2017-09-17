@@ -4,6 +4,7 @@
  */
 package org.pigeon.proxy;
 
+import org.pigeon.common.util.EncryptUtil;
 import org.pigeon.config.MethodConfig;
 import org.pigeon.config.PigeonConfig;
 import org.pigeon.config.handler.ConfigHandler;
@@ -38,21 +39,21 @@ public class ClientInvocationHandler<T> implements InvocationHandler {
 
         // 封装请求
         PigeonRequest request = new PigeonRequest();
+        String methodSign = EncryptUtil.md532(clazz.getName() + method.getName());
         request.setInterfaceName(clazz.getName());
-        request.setMethodName(method.getName());
+        request.setMethodSign(methodSign);
         request.setReturnType(method.getReturnType());
-        if (null != args && 0 != args.length) {
-            request.setParameterTypes(Arrays.stream(args).map((arg) -> arg.getClass()).toArray(Class<?>[]::new));
+        if (null != args && 0 != args.length)
             request.setParameters(args);
-        }
         // 获取method配置 TODO 目前不支持方法重载的情况
-        MethodConfig methodConfig = PigeonConfig.methodConfigs.get(clazz.getName() + method.getName());
-        if (null == methodConfig) request.setSync(true);
-        else request.setSync(methodConfig.isSync());
+        MethodConfig methodConfig = PigeonConfig.methodConfigs.get(methodSign);
+        request.setSync(null == methodConfig ? true : methodConfig.isSync());
+
         // 服务选举
         Router router = ConfigHandler.router;
-        List<String> servers = RegisterHandler.services.get(request.getInterfaceName());
-        String serverAddress = router.elect(servers);
+        List<String> servers = RegisterHandler.services.get(clazz.getName());
+        String serverAddress = router.elect(servers, clazz.getName());
+
         // 发送请求
         if (request.isSync()) {
             return rpcHandler.sendMessageSync(request, serverAddress);

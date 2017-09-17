@@ -9,6 +9,8 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
+import org.pigeon.config.MethodConfig;
+import org.pigeon.config.PigeonConfig;
 import org.pigeon.model.PigeonRequest;
 import org.pigeon.rpc.RpcHandler;
 

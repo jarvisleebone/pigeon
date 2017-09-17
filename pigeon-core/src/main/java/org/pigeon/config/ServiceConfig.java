@@ -1,7 +1,11 @@
 package org.pigeon.config;
 
+import org.pigeon.common.util.EncryptUtil;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
 
 public class ServiceConfig<T> implements ApplicationListener {
 
@@ -12,6 +16,9 @@ public class ServiceConfig<T> implements ApplicationListener {
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
         PigeonConfig.serviceConfigs.put(interfaceClass.getName(), this);
+
+        for (Method m : interfaceClass.getMethods())
+            PigeonConfig.serviceMethods.put(EncryptUtil.md532(interfaceClass.getName() + m.getName()), m);
     }
 
     public String getId() {

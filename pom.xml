@@ -8,6 +8,7 @@
   <modules>
     <module>pigeon-core</module>
     <module>pigeon-demo</module>
+      <module>thrift</module>
   </modules>
   <packaging>pom</packaging>
 

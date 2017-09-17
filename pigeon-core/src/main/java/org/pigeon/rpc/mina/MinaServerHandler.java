@@ -19,7 +19,9 @@ public class MinaServerHandler extends IoHandlerAdapter {
             try {
                 PigeonRequest request = (PigeonRequest) message;
                 ServiceConfig serviceConfig = PigeonConfig.serviceConfigs.get(request.getInterfaceName());
-                Method method = serviceConfig.getRef().getClass().getMethod(request.getMethodName(), request.getParameterTypes());
+                Method method = PigeonConfig.serviceMethods.get(request.getMethodSign());
+                if (null == method)
+                    throw new NoSuchMethodException();
 
                 if ("void".equals(method.getReturnType().getName())) {
                     method.invoke(serviceConfig.getRef(), request.getParameters());
@@ -28,8 +30,7 @@ public class MinaServerHandler extends IoHandlerAdapter {
                         session.write(method.invoke(serviceConfig.getRef(), request.getParameters()));
                     } else {
                         PigeonResponse response = new PigeonResponse();
-                        response.setInterfaceName(request.getInterfaceName());
-                        response.setMethodName(request.getMethodName());
+                        response.setMethodSign(request.getMethodSign());
                         response.setResult(method.invoke(serviceConfig.getRef(), request.getParameters()));
                         session.write(response);
                     }

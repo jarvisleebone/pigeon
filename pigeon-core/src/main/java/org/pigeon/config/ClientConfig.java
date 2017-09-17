@@ -13,6 +13,7 @@ public class ClientConfig<T> implements ApplicationListener, FactoryBean<T> {
 
     private String id;
     private Class<T> interfaceClass;
+
     @Override
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
         try {

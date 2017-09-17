@@ -4,6 +4,8 @@
  */
 package org.pigeon.router;
 
+import org.pigeon.exception.PigeonException;
+
 import java.util.List;
 
 /**
@@ -12,6 +14,6 @@ import java.util.List;
  */
 public interface Router {
 
-    String elect(List<String> servers);
+    String elect(List<String> servers, String interfaceName) throws PigeonException;
 
 }

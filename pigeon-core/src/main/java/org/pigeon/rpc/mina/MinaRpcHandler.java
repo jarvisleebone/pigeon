@@ -9,8 +9,6 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.pigeon.config.MethodConfig;
-import org.pigeon.config.PigeonConfig;
 import org.pigeon.model.PigeonRequest;
 import org.pigeon.rpc.RpcHandler;
 
@@ -38,6 +36,7 @@ public class MinaRpcHandler extends RpcHandler {
 //             acceptor.getFilterChain().addLast("logger", new LoggingFilter());
             // 设置编码过滤器
             acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
+//            acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new PigeonSerializationCodecFactory()));
 //            acceptor.getFilterChain().addLast("exec", new ExecutorFilter(new UnorderedThreadPoolExecutor()));
             // 指定业务逻辑处理器
             acceptor.setHandler(new MinaServerHandler());
@@ -105,6 +104,7 @@ public class MinaRpcHandler extends RpcHandler {
                     NioSocketConnector connector = new NioSocketConnector();
 //                    connector.getFilterChain().addLast("logger", new LoggingFilter());
                     connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
+//                    connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new PigeonSerializationCodecFactory()));
 //                    connector.getFilterChain().addLast("exec", new ExecutorFilter(new UnorderedThreadPoolExecutor()));
                     // 设置连接超时检查时间
                     connector.setConnectTimeoutCheckInterval(30);

@@ -4,6 +4,7 @@ import com.dyuproject.protostuff.LinkedBuffer;
 import com.dyuproject.protostuff.ProtostuffIOUtil;
 import com.dyuproject.protostuff.Schema;
 import com.dyuproject.protostuff.runtime.RuntimeSchema;
+import org.pigeon.model.PigeonRequest;
 import org.springframework.objenesis.Objenesis;
 import org.springframework.objenesis.ObjenesisStd;
 
@@ -55,6 +56,21 @@ public class ProtostuffSerializer implements Serializer {
             }
         }
         return schema;
+    }
+
+    public static void main(String[] args) throws Exception{
+
+        PigeonRequest request = new PigeonRequest();
+        request.setInterfaceName("123456");
+
+        ProtostuffSerializer serializer = new ProtostuffSerializer();
+
+        byte[] bytes = serializer.serialize(request);
+
+        PigeonRequest request1 = serializer.deserialize(bytes, PigeonRequest.class);
+        System.out.println(request1.getInterfaceName());
+
+
     }
 
 }

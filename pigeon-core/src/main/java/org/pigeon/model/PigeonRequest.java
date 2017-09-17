@@ -51,4 +51,9 @@ public class PigeonRequest implements Serializable {
     public void setMethodSign(String methodSign) {
         this.methodSign = methodSign;
     }
+
+    @Override
+    public String toString() {
+        return interfaceName + ":" + methodSign;
+    }
 }

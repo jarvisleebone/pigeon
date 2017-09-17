@@ -1,5 +1,6 @@
 package org.pigeon.demo.client;
 
+import org.pigeon.demo.server.model.Person;
 import org.pigeon.demo.server.service.HelloService;
 import org.pigeon.demo.server.service.WorldService;
 import org.springframework.context.ApplicationContext;
@@ -20,11 +21,13 @@ public class PigeonDemoClient {
         HelloService helloService = applicationContext.getBean(HelloService.class);
         WorldService worldService = applicationContext.getBean(WorldService.class);
         helloService.testVoid("void");
+        Person p = helloService.addAge(new Person("name", 20));
+        System.out.println(p.getName() + ":" + p.getAge());
         worldService.world("hello");
-//        System.out.println(helloService.hello("哈哈哈哈哈哈哈哈"));
+        System.out.println(helloService.hello("哈哈哈哈哈哈哈哈"));
 
 //        async(worldService);
-        sync(helloService, 100 * 10000);
+//        sync(helloService, 100 * 10000);
     }
 
     private static void sync(HelloService helloService, int count) {

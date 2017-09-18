@@ -1,6 +1,7 @@
 package org.pigeon.demo.client;
 
 import org.pigeon.demo.server.model.Person;
+import org.pigeon.demo.server.service.HelloService;
 import org.pigeon.demo.server.service.TestService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -18,6 +19,8 @@ public class PigeonDemoClient {
         System.out.println("client start");
 
         TestService testService = applicationContext.getBean(TestService.class);
+        HelloService helloService = applicationContext.getBean(HelloService.class);
+
         Person p = new Person("person", 50);
         // sync
         System.out.println(testService.test("test", 20));
@@ -46,6 +49,7 @@ public class PigeonDemoClient {
 
         for (int i = 0; i < count; i++) {
             fixedThreadPool.execute(() -> {
+//                String str = helloService.hello("test");
                 String str = testService.testSync("test");
 //                testService.testAsync("test async", 20);
                 countDown.countDown();

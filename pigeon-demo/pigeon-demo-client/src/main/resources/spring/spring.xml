@@ -44,6 +44,8 @@
         </pigeon:method>
     </pigeon:client>
 
+    <pigeon:client id="helloService" interface="org.pigeon.demo.server.service.HelloService" />
+
     <bean id="testAsyncCallback" class="org.pigeon.demo.client.callback.TestAsyncCallback" />
     <bean id="testAsync2Callback" class="org.pigeon.demo.client.callback.TestAsync2Callback" />
     <bean id="testAsyncPersonCallback" class="org.pigeon.demo.client.callback.TestAsyncPersonCallback" />

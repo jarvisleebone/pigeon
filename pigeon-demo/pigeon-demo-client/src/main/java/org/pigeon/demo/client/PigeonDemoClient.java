@@ -1,8 +1,7 @@
 package org.pigeon.demo.client;
 
 import org.pigeon.demo.server.model.Person;
-import org.pigeon.demo.server.service.HelloService;
-import org.pigeon.demo.server.service.WorldService;
+import org.pigeon.demo.server.service.TestService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -18,19 +17,27 @@ public class PigeonDemoClient {
         ApplicationContext applicationContext = new ClassPathXmlApplicationContext(new String[]{"spring/spring.xml"});
         System.out.println("client start");
 
-        HelloService helloService = applicationContext.getBean(HelloService.class);
-        WorldService worldService = applicationContext.getBean(WorldService.class);
-        helloService.testVoid("void");
-        Person p = helloService.addAge(new Person("name", 20));
-        System.out.println(p.getName() + ":" + p.getAge());
-        worldService.world("hello", 88, 20.78);
-        worldService.world(799, 38.4876f);
-        System.out.println(helloService.hello("哈哈哈哈哈哈哈哈"));
+        TestService testService = applicationContext.getBean(TestService.class);
+        Person p = new Person("person", 50);
+        // sync
+        System.out.println(testService.test("test", 20));
+        System.out.println(testService.test(50));
+        testService.test();
+        System.out.println(testService.test(p));
+        // async
+        testService.testAsync();
+        testService.testAsync(p);
+        testService.testAsync("test async");
+        testService.testAsync("test async", 33, 26.58);
+        testService.testAsync2("test async2");
+        testService.testAsync2("test async2", 70);
+        testService.testAsync2("test async2", 90, 25.64);
 
-        sync(helloService, 100 * 10000);
+
+        test(testService, 100 * 10000);
     }
 
-    private static void sync(HelloService helloService, int count) {
+    private static void test(TestService testService, int count) {
         CountDownLatch countDown = new CountDownLatch(count);
 
         fixedThreadPool = Executors.newFixedThreadPool(100);
@@ -39,7 +46,7 @@ public class PigeonDemoClient {
 
         for (int i = 0; i < count; i++) {
             fixedThreadPool.execute(() -> {
-                String str = helloService.hello("test");
+                String str = testService.testSync("test");
                 countDown.countDown();
             });
         }

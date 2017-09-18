@@ -14,10 +14,7 @@
     <!--<pigeon:registry id="registry" protocol="zookeeper" address="192.168.0.114" port="2181"/>-->
     <pigeon:registry id="registry" protocol="zookeeper" address="192.168.216.129" port="2181" />
 
-    <pigeon:service id="helloService" interface="org.pigeon.demo.server.service.HelloService" ref="helloServiceImpl" />
-    <pigeon:service id="worldService" interface="org.pigeon.demo.server.service.WorldService" ref="worldServiceImpl" />
+    <pigeon:service id="testService" interface="org.pigeon.demo.server.service.TestService" ref="testServiceImpl" />
 
-    <bean class="org.pigeon.demo.server.service.impl.HelloServiceImpl" id="helloServiceImpl" />
-    <bean class="org.pigeon.demo.server.service.impl.WorldServiceImpl" id="worldServiceImpl" />
-
+    <bean class="org.pigeon.demo.server.service.impl.TestServiceImpl" id="testServiceImpl" />
 </beans>

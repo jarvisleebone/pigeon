@@ -8,12 +8,12 @@ import org.pigeon.callback.PigeonCallback;
 
 /**
  * @author lixiang
- * @version $Id World2ServiceCallback.java, v 0.1 2017-09-18 10:29 lixiang Exp $$
+ * @version $Id TestAsyncCallback.java, v 0.1 2017-09-18 11:15 lixiang Exp $$
  */
-public class World2ServiceCallback implements PigeonCallback {
+public class TestAsync2Callback implements PigeonCallback {
 
     @Override
     public void callback(Object o) {
-        System.out.println("world2 service callback: " + o.toString());
+        System.out.println("testAsync2 callback:" + o.toString());
     }
 }

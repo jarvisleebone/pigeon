@@ -1,5 +1,7 @@
 package org.pigeon.config;
 
+import net.sf.cglib.reflect.FastClass;
+import net.sf.cglib.reflect.FastMethod;
 import org.pigeon.common.util.ReflectUtil;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
@@ -15,11 +17,9 @@ public class ServiceConfig<T> implements ApplicationListener {
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
         PigeonConfig.serviceConfigs.put(interfaceClass.getName(), this);
-
         for (Method m : interfaceClass.getMethods()) {
             PigeonConfig.serviceMethods.put(ReflectUtil.getMethodSign(interfaceClass, m), m);
         }
-
     }
 
     public String getId() {

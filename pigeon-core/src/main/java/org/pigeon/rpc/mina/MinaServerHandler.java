@@ -37,9 +37,9 @@ public class MinaServerHandler extends IoHandlerAdapter {
                 }
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
             } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
         });

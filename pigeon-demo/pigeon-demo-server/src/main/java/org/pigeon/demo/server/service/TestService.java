@@ -36,4 +36,6 @@ public interface TestService {
 
     String testSync(String str);
 
+    String testAsync(String str, int i);
+
 }

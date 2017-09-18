@@ -85,4 +85,9 @@ public class TestServiceImpl implements TestService {
     public String testSync(String str) {
         return "hello " + str;
     }
+
+    @Override
+    public String testAsync(String str, int i) {
+        return "hello " + str + ":" + i;
+    }
 }

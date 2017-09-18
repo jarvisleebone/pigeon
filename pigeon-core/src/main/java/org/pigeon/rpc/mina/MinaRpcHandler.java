@@ -56,16 +56,21 @@ public class MinaRpcHandler extends RpcHandler {
         // 获取连接
         ConnectFuture cf = minaConnections.get(serverAddress).get("sync");
         // 请求发送到服务端
-        cf.getSession().write(request).awaitUninterruptibly();
-        // 接口无返回值直接返回null
-        if ("void".equals(request.getReturnType().getName())) return null;
-        // 读取接口返回值
-        ReadFuture readFuture = cf.getSession().read();
-        // 是否超时
-        if (readFuture.awaitUninterruptibly(10, TimeUnit.SECONDS)) {
-            return readFuture.getMessage();
+        if ("void".equals(request.getReturnType().getName())) {
+            // 接口无返回值无需等待发送完成，直接返回null
+            cf.getSession().write(request);
+            return null;
         } else {
-            throw new Exception("time out");
+            // 等待发送完成
+            cf.getSession().write(request).awaitUninterruptibly();
+            // 读取接口返回值
+            ReadFuture readFuture = cf.getSession().read();
+            // 是否超时
+            if (readFuture.awaitUninterruptibly(10, TimeUnit.SECONDS)) {
+                return readFuture.getMessage();
+            } else {
+                throw new Exception("time out");
+            }
         }
     }
 
@@ -76,7 +81,7 @@ public class MinaRpcHandler extends RpcHandler {
         // 获取连接
         ConnectFuture cf = minaConnections.get(serverAddress).get("async");
         // 请求发送到服务端
-        cf.getSession().write(request).awaitUninterruptibly();
+        cf.getSession().write(request);
     }
 
     /**

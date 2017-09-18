@@ -47,6 +47,7 @@ public class PigeonDemoClient {
         for (int i = 0; i < count; i++) {
             fixedThreadPool.execute(() -> {
                 String str = testService.testSync("test");
+//                testService.testAsync("test async", 20);
                 countDown.countDown();
             });
         }
@@ -63,5 +64,6 @@ public class PigeonDemoClient {
         System.out.println("qps:" + count / ((endTime - beginTime) / 1000.00));
         System.out.println("平均耗时：" + (endTime - beginTime) / (count * 1.00) + "ms");
     }
+
 
 }

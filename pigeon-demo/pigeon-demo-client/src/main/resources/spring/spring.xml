@@ -37,6 +37,11 @@
             <pigeon:paramter javaType="int" seq="1" />
             <pigeon:paramter javaType="double" seq="2" />
         </pigeon:method>
+
+        <pigeon:method id="testAsync6" name="testAsync" sync="false">
+            <pigeon:paramter javaType="java.lang.String" seq="0" />
+            <pigeon:paramter javaType="int" seq="1" />
+        </pigeon:method>
     </pigeon:client>
 
     <bean id="testAsyncCallback" class="org.pigeon.demo.client.callback.TestAsyncCallback" />

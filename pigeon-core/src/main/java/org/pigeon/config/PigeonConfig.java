@@ -2,7 +2,6 @@ package org.pigeon.config;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.mina.util.ConcurrentHashSet;
-import org.pigeon.callback.PigeonCallback;
 import org.pigeon.config.handler.ConfigHandler;
 import org.pigeon.registry.RegisterHandler;
 import org.pigeon.rpc.RpcHandler;
@@ -14,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PigeonConfig implements ApplicationListener{
+public class PigeonConfig implements ApplicationListener {
 
     // 服务端提供的接口配置
     public static final Map<String, ServiceConfig> serviceConfigs = new ConcurrentHashMap<>();

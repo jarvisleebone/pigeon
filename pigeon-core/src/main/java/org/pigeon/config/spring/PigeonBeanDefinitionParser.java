@@ -6,10 +6,8 @@ import org.pigeon.common.enums.RegistryProtocolEnum;
 import org.pigeon.common.enums.RouteProtocolEnum;
 import org.pigeon.common.enums.RpcProtocolEnum;
 import org.pigeon.common.enums.SerializerProtocolEnum;
-import org.pigeon.common.util.ReflectUtil;
 import org.pigeon.config.*;
 import org.pigeon.config.handler.ConfigHandler;
-import org.pigeon.exception.PigeonException;
 import org.pigeon.registry.RegisterHandlerFactory;
 import org.pigeon.router.RouterFactory;
 import org.pigeon.rpc.RpcHandlerFactory;
@@ -34,7 +32,7 @@ public class PigeonBeanDefinitionParser implements BeanDefinitionParser {
         this.beanClass = beanClass;
     }
 
-    private BeanDefinition parse(Element element, ParserContext parserContext, Class<?> beanClass, String clientInterface) throws PigeonException{
+    private BeanDefinition parse(Element element, ParserContext parserContext, Class<?> beanClass, String clientInterface) {
         RootBeanDefinition beanDefinition = new RootBeanDefinition();
         beanDefinition.setBeanClass(beanClass);
         beanDefinition.setLazyInit(false);
@@ -130,12 +128,7 @@ public class PigeonBeanDefinitionParser implements BeanDefinitionParser {
     }
 
     @Override
-    public BeanDefinition parse(Element element, ParserContext parserContext){
-        try {
-            return parse(element, parserContext, beanClass, "");
-        } catch (PigeonException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public BeanDefinition parse(Element element, ParserContext parserContext) {
+        return parse(element, parserContext, beanClass, "");
     }
 }

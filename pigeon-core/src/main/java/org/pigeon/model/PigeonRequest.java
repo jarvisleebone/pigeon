@@ -9,7 +9,6 @@ public class PigeonRequest implements Serializable {
     private Object[] parameters;
     private Class<?> returnType;
     private boolean sync;
-
     private String methodSign;
 
     public String getInterfaceName() {

@@ -7,7 +7,7 @@ public class PigeonRequest implements Serializable {
     private static final long serialVersionUID = -6362419231214892659L;
     private String interfaceName;
     private Object[] parameters;
-    private Class<?> returnType;
+    private String returnType;
     private boolean sync;
     private String methodSign;
 
@@ -35,11 +35,11 @@ public class PigeonRequest implements Serializable {
         this.sync = sync;
     }
 
-    public Class<?> getReturnType() {
+    public String getReturnType() {
         return returnType;
     }
 
-    public void setReturnType(Class<?> returnType) {
+    public void setReturnType(String returnType) {
         this.returnType = returnType;
     }
 

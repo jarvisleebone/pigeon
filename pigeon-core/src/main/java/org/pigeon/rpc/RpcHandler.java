@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 public abstract class RpcHandler {
 
     // 执行服务端逻辑的线程池
-    private static ExecutorService fixedThreadPool = Executors.newFixedThreadPool(5);
+    private static ExecutorService fixedThreadPool = Executors.newFixedThreadPool(16);
 
     public abstract void bindService(int port);
 

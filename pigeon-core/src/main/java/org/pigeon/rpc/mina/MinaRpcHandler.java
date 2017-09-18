@@ -52,11 +52,11 @@ public class MinaRpcHandler extends RpcHandler {
     @Override
     public Object sendMessageSync(PigeonRequest request, String serverAddress) throws Exception {
         // 初始化连接
-        initConn(request, serverAddress);
+        initConn(request.isSync(), serverAddress);
         // 获取连接
         ConnectFuture cf = minaConnections.get(serverAddress).get("sync");
         // 请求发送到服务端
-        if ("void".equals(request.getReturnType().getName())) {
+        if ("void".equals(request.getReturnType())) {
             // 接口无返回值无需等待发送完成，直接返回null
             cf.getSession().write(request);
             return null;
@@ -77,7 +77,7 @@ public class MinaRpcHandler extends RpcHandler {
     @Override
     public void sendMessageAsync(PigeonRequest request, String serverAddress) throws Exception {
         // 初始化连接
-        initConn(request, serverAddress);
+        initConn(request.isSync(), serverAddress);
         // 获取连接
         ConnectFuture cf = minaConnections.get(serverAddress).get("async");
         // 请求发送到服务端
@@ -87,10 +87,10 @@ public class MinaRpcHandler extends RpcHandler {
     /**
      * 初始化连接，如果当前客户端未持有对该服务端的连接，则创建一个长连接
      *
-     * @param request
+     * @param isSync
      * @param serverAddress
      */
-    private void initConn(PigeonRequest request, String serverAddress) {
+    private void initConn(boolean isSync, String serverAddress) {
         if (null == minaConnections.get(serverAddress)) {
             synchronized (minaConnections) {
                 if (null == minaConnections.get(serverAddress)) {
@@ -99,7 +99,7 @@ public class MinaRpcHandler extends RpcHandler {
             }
         }
 
-        String connType = request.isSync() ? "sync" : "async";
+        String connType = isSync ? "sync" : "async";
         ConnectFuture cf = minaConnections.get(serverAddress).get(connType);
         if (null == cf) {
             synchronized (minaConnections) {
@@ -113,7 +113,7 @@ public class MinaRpcHandler extends RpcHandler {
 //                    connector.getFilterChain().addLast("exec", new ExecutorFilter(new UnorderedThreadPoolExecutor()));
                     // 设置连接超时检查时间
                     connector.setConnectTimeoutCheckInterval(30);
-                    if (request.isSync()) connector.getSessionConfig().setUseReadOperation(true); // 同步连接
+                    if (isSync) connector.getSessionConfig().setUseReadOperation(true); // 同步连接
                     else connector.setHandler(new MinaClientHandler()); // 异步连接
                     // 创建连接
                     cf = connector.connect(new InetSocketAddress(ipPort[0], Integer.parseInt(ipPort[1])));

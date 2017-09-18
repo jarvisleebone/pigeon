@@ -23,7 +23,7 @@ public class MinaServerHandler extends IoHandlerAdapter {
                 if (null == method)
                     throw new NoSuchMethodException();
 
-                if ("void".equals(method.getReturnType().getName())) {
+                if ("void".equals(request.getReturnType())) {
                     method.invoke(serviceConfig.getRef(), request.getParameters());
                 } else {
                     if (request.isSync()) {

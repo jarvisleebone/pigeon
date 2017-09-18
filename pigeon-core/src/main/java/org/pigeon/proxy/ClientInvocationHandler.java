@@ -41,7 +41,7 @@ public class ClientInvocationHandler<T> implements InvocationHandler {
         String methodSign = ReflectUtil.getMethodSign(clazz, method);
         request.setInterfaceName(clazz.getName());
         request.setMethodSign(methodSign);
-        request.setReturnType(method.getReturnType());
+        request.setReturnType(method.getReturnType().getName());
         if (null != args && 0 != args.length)
             request.setParameters(args);
         MethodConfig methodConfig = PigeonConfig.methodConfigs.get(methodSign);

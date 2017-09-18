@@ -23,11 +23,11 @@ public class PigeonDemoClient {
         helloService.testVoid("void");
         Person p = helloService.addAge(new Person("name", 20));
         System.out.println(p.getName() + ":" + p.getAge());
-        worldService.world("hello");
+        worldService.world("hello", 88, 20.78);
+        worldService.world(799, 38.4876f);
         System.out.println(helloService.hello("哈哈哈哈哈哈哈哈"));
 
-//        async(worldService);
-//        sync(helloService, 100 * 10000);
+        sync(helloService, 100 * 10000);
     }
 
     private static void sync(HelloService helloService, int count) {
@@ -55,11 +55,6 @@ public class PigeonDemoClient {
         System.out.println("sec:" + (endTime - beginTime) / 1000.00);
         System.out.println("qps:" + count / ((endTime - beginTime) / 1000.00));
         System.out.println("平均耗时：" + (endTime - beginTime) / (count * 1.00) + "ms");
-    }
-
-
-    private static void async(WorldService worldService) {
-        worldService.world("hello");
     }
 
 }

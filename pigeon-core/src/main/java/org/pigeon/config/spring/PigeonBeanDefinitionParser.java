@@ -6,8 +6,10 @@ import org.pigeon.common.enums.RegistryProtocolEnum;
 import org.pigeon.common.enums.RouteProtocolEnum;
 import org.pigeon.common.enums.RpcProtocolEnum;
 import org.pigeon.common.enums.SerializerProtocolEnum;
+import org.pigeon.common.util.ReflectUtil;
 import org.pigeon.config.*;
 import org.pigeon.config.handler.ConfigHandler;
+import org.pigeon.exception.PigeonException;
 import org.pigeon.registry.RegisterHandlerFactory;
 import org.pigeon.router.RouterFactory;
 import org.pigeon.rpc.RpcHandlerFactory;
@@ -20,6 +22,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.Comparator;
+import java.util.Map;
+import java.util.TreeMap;
+
 public class PigeonBeanDefinitionParser implements BeanDefinitionParser {
 
     private final Class<?> beanClass;
@@ -28,7 +34,7 @@ public class PigeonBeanDefinitionParser implements BeanDefinitionParser {
         this.beanClass = beanClass;
     }
 
-    private BeanDefinition parse(Element element, ParserContext parserContext, Class<?> beanClass, String clientInterface) {
+    private BeanDefinition parse(Element element, ParserContext parserContext, Class<?> beanClass, String clientInterface) throws PigeonException{
         RootBeanDefinition beanDefinition = new RootBeanDefinition();
         beanDefinition.setBeanClass(beanClass);
         beanDefinition.setLazyInit(false);
@@ -97,19 +103,39 @@ public class PigeonBeanDefinitionParser implements BeanDefinitionParser {
             PigeonConfig.clientInterfaceNames.add(interfaceName);
         }
         if (MethodConfig.class.equals(beanClass)) {
+            String methodName = element.getAttribute("name");
             beanDefinition.getPropertyValues().add("interfaceName", clientInterface);
-            beanDefinition.getPropertyValues().add("name", element.getAttribute("name"));
+            beanDefinition.getPropertyValues().add("name", methodName);
             beanDefinition.getPropertyValues().add("sync", element.getAttribute("sync"));
             String callback = element.getAttribute("callback");
             if (StringUtils.isNotEmpty(callback))
                 beanDefinition.getPropertyValues().add("callback", new RuntimeBeanReference(callback));
+            // 解析参数列表配置
+            Map<Integer, String> paramterTypesMap = new TreeMap<>(Comparator.comparing(Integer::intValue));
+            NodeList paramterTypes = element.getChildNodes();
+            if (null != paramterTypes && 0 != paramterTypes.getLength()) {
+                for (int i = 0; i < paramterTypes.getLength(); i++) {
+                    Node node = paramterTypes.item(i);
+                    if (node instanceof Element) {
+                        Element paramterType = (Element) node;
+                        Integer seq = Integer.valueOf(paramterType.getAttribute("seq"));
+                        String javaType = paramterType.getAttribute("javaType");
+                        paramterTypesMap.put(seq, javaType);
+                        beanDefinition.getPropertyValues().add("paramterTypes", paramterTypesMap);
+                    }
+                }
+            }
         }
-
         return beanDefinition;
     }
 
     @Override
-    public BeanDefinition parse(Element element, ParserContext parserContext) {
-        return parse(element, parserContext, beanClass, "");
+    public BeanDefinition parse(Element element, ParserContext parserContext){
+        try {
+            return parse(element, parserContext, beanClass, "");
+        } catch (PigeonException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

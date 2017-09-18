@@ -6,8 +6,13 @@ package org.pigeon.config;
 
 import org.pigeon.callback.PigeonCallback;
 import org.pigeon.common.util.EncryptUtil;
+import org.pigeon.common.util.ReflectUtil;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author lixiang
@@ -20,10 +25,11 @@ public class MethodConfig implements ApplicationListener {
     private String name;
     private boolean sync;
     private PigeonCallback callback;
+    private Map<Integer, String> paramterTypes = new TreeMap<>();
 
     @Override
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
-        String methodSign = EncryptUtil.md532(interfaceName + name);
+        String methodSign = ReflectUtil.getMethodSign(interfaceName, name, paramterTypes.values().toArray());
         PigeonConfig.methodConfigs.put(methodSign, this);
     }
 
@@ -105,5 +111,23 @@ public class MethodConfig implements ApplicationListener {
      */
     public void setInterfaceName(String interfaceName) {
         this.interfaceName = interfaceName;
+    }
+
+    /**
+     * Getter method for property <tt>paramterTypes</tt>.
+     *
+     * @return property value of paramterTypes
+     */
+    public Map<Integer, String> getParamterTypes() {
+        return paramterTypes;
+    }
+
+    /**
+     * Setter method for property <tt>paramterTypes</tt>.
+     *
+     * @param paramterTypes value to be assigned to property paramterTypes
+     */
+    public void setParamterTypes(Map<Integer, String> paramterTypes) {
+        this.paramterTypes = paramterTypes;
     }
 }

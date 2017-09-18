@@ -4,7 +4,6 @@
  */
 package org.pigeon.proxy;
 
-import org.pigeon.common.util.EncryptUtil;
 import org.pigeon.common.util.ReflectUtil;
 import org.pigeon.config.MethodConfig;
 import org.pigeon.config.PigeonConfig;
@@ -16,7 +15,6 @@ import org.pigeon.rpc.RpcHandler;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -46,7 +44,6 @@ public class ClientInvocationHandler<T> implements InvocationHandler {
         request.setReturnType(method.getReturnType());
         if (null != args && 0 != args.length)
             request.setParameters(args);
-        // 获取method配置 TODO 目前不支持方法重载的情况
         MethodConfig methodConfig = PigeonConfig.methodConfigs.get(methodSign);
         request.setSync(null == methodConfig ? true : methodConfig.isSync());
 

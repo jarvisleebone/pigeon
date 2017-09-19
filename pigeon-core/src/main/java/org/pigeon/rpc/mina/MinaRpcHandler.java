@@ -7,6 +7,8 @@ import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
+import org.apache.mina.filter.executor.ExecutorFilter;
+import org.apache.mina.filter.executor.UnorderedThreadPoolExecutor;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.pigeon.model.PigeonRequest;
@@ -14,8 +16,8 @@ import org.pigeon.rpc.RpcHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class MinaRpcHandler extends RpcHandler {
@@ -23,7 +25,7 @@ public class MinaRpcHandler extends RpcHandler {
     private static final Logger LOGGER = Logger.getLogger(MinaRpcHandler.class);
 
     // 客户端持有的与服务端的连接
-    private static Map<String, Map<String, ConnectFuture>> minaConnections = new ConcurrentHashMap<>();
+    private static Map<String, Map<String, ConnectFuture>> minaConnections = new HashMap<>();
 
     @Override
     public void bindService(int port) {
@@ -94,7 +96,7 @@ public class MinaRpcHandler extends RpcHandler {
         if (null == minaConnections.get(serverAddress)) {
             synchronized (minaConnections) {
                 if (null == minaConnections.get(serverAddress)) {
-                    minaConnections.put(serverAddress, new ConcurrentHashMap<>());
+                    minaConnections.put(serverAddress, new HashMap<>());
                 }
             }
         }

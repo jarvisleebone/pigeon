@@ -6,6 +6,7 @@ import org.pigeon.demo.server.service.TestService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,8 +37,15 @@ public class PigeonDemoClient {
         testService.testAsync2("test async2", 70);
         testService.testAsync2("test async2", 90, 25.64);
 
-
-        test(testService, 100 * 10000);
+        Scanner s = new Scanner(System.in);
+        while (true) {
+            System.out.println("循环次数：");
+            String line = s.nextLine();
+            int count = Integer.parseInt(line);
+            System.out.println("-------------------------");
+            test(testService, count);
+            System.out.println("-------------------------");
+        }
     }
 
     private static void test(TestService testService, int count) {

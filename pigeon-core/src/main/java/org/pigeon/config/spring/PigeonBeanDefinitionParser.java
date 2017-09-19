@@ -109,9 +109,9 @@ public class PigeonBeanDefinitionParser implements BeanDefinitionParser {
             if (StringUtils.isNotEmpty(callback))
                 beanDefinition.getPropertyValues().add("callback", new RuntimeBeanReference(callback));
             // 解析参数列表配置
-            Map<Integer, String> paramterTypesMap = new TreeMap<>(Comparator.comparing(Integer::intValue));
             NodeList paramterTypes = element.getChildNodes();
             if (null != paramterTypes && 0 != paramterTypes.getLength()) {
+                Map<Integer, String> paramterTypesMap = new TreeMap<>(Comparator.comparing(Integer::intValue));
                 for (int i = 0; i < paramterTypes.getLength(); i++) {
                     Node node = paramterTypes.item(i);
                     if (node instanceof Element) {

@@ -31,20 +31,21 @@ public class MethodConfig implements ApplicationListener {
     @Override
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
         try {
-            Class clazz = Class.forName(interfaceName);
             if (0 == paramterTypes.size()) {
+                Class clazz = Class.forName(interfaceName);
                 for (Method method : clazz.getMethods()) {
                     if (name.equals(method.getName())) {
                         String methodSign = ReflectUtil.getMethodSign(clazz, method);
                         PigeonConfig.methodConfigs.put(methodSign, this);
                     }
                 }
+            } else {
+                String methodSign = ReflectUtil.getMethodSign(interfaceName, name, paramterTypes.values().toArray());
+                PigeonConfig.methodConfigs.put(methodSign, this);
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        String methodSign = ReflectUtil.getMethodSign(interfaceName, name, paramterTypes.values().toArray());
-        PigeonConfig.methodConfigs.put(methodSign, this);
     }
 
     /**

@@ -5,6 +5,7 @@
 package org.pigeon.router;
 
 import org.apache.commons.lang3.RandomUtils;
+import org.pigeon.callback.PigeonCallback;
 import org.pigeon.common.enums.RouteProtocolEnum;
 import org.pigeon.exception.PigeonException;
 
@@ -25,6 +26,9 @@ public class RouterFactory {
     public static Router getRouter(String route) {
         RouteProtocolEnum routeProtocolEnum = RouteProtocolEnum.valueOf(route.toUpperCase());
         switch (routeProtocolEnum) {
+            case DIRECT: // 连第一个
+                router = RouterFactory::direct;
+                break;
             case RANDOM: // 随机
                 router = RouterFactory::random;
                 break;
@@ -39,6 +43,12 @@ public class RouterFactory {
                 break;
         }
         return router;
+    }
+
+    private static String direct(List<String> servers, String interfaceName) throws PigeonException {
+        if (null == servers || 0 == servers.size())
+            throw new PigeonException(interfaceName + "：该接口无可用服务端");
+        return servers.get(0);
     }
 
     private static String random(List<String> servers, String interfaceName) throws PigeonException {

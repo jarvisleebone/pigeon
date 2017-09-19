@@ -8,23 +8,23 @@
        http://pigeon.org/schema/pigeon
        http://pigeon.org/schema/pigeon.xsd">
 
-    <pigeon:config id="config" protocol="mina" route="rr" serializer="protostuff" />
+    <pigeon:config id="config" protocol="mina" route="direct" serializer="protostuff" />
 
     <!--<pigeon:registry id="registry" protocol="zookeeper" address="192.168.0.114" port="2181" />-->
     <pigeon:registry id="registry" protocol="zookeeper" address="192.168.216.135" port="2181" />
 
     <pigeon:client id="testService" interface="org.pigeon.demo.server.service.TestService">
-        <pigeon:method id="testAsync0" name="testAsync" sync="false" callback="testAsyncCallback">
+        <pigeon:method id="testAsync0" name="testAsync" sync="false" />
+
+        <pigeon:method id="testAsync1" name="testAsync" sync="false" callback="testAsyncCallback">
             <pigeon:paramter javaType="java.lang.String" seq="0" />
             <pigeon:paramter javaType="int" seq="1" />
             <pigeon:paramter javaType="double" seq="2" />
         </pigeon:method>
 
-        <pigeon:method id="testAsync1" name="testAsync" sync="false" callback="testAsyncCallback">
+        <pigeon:method id="testAsync2" name="testAsync" sync="false" callback="testAsyncCallback">
             <pigeon:paramter javaType="java.lang.String" seq="0" />
         </pigeon:method>
-
-        <pigeon:method id="testAsync2" name="testAsync" sync="false" />
 
         <pigeon:method id="testAsync3" name="testAsync" sync="false" callback="testAsyncPersonCallback">
             <pigeon:paramter javaType="org.pigeon.demo.server.model.Person" seq="0"/>

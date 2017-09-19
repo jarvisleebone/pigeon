@@ -48,9 +48,8 @@ public class ClientInvocationHandler<T> implements InvocationHandler {
         request.setSync(null == methodConfig ? true : methodConfig.isSync());
 
         // 服务选举
-        Router router = ConfigHandler.router;
-        List<String> servers = RegisterHandler.services.get(clazz.getName());
-        String serverAddress = router.elect(servers, clazz.getName());
+        List<String> servers = RegisterHandler.services.get(request.getInterfaceName());
+        String serverAddress = ConfigHandler.router.elect(servers, request.getInterfaceName());
 
         // 发送请求
         if (request.isSync()) {

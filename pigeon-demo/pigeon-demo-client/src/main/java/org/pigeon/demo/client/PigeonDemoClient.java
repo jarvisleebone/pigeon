@@ -28,7 +28,7 @@ public class PigeonDemoClient {
         System.out.println(testService.test(50));
         testService.test();
         System.out.println(testService.test(p));
-        // async
+//         async
         testService.testAsync();
         testService.testAsync(p);
         testService.testAsync("test async");

@@ -9,8 +9,6 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
 import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.filter.executor.UnorderedThreadPoolExecutor;
-import org.apache.mina.transport.socket.SocketAcceptor;
-import org.apache.mina.transport.socket.SocketConnector;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.pigeon.common.NamedThreadFactory;
@@ -23,20 +21,19 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class MinaRpcHandler extends RpcHandler {
 
     private static final Logger LOGGER = Logger.getLogger(MinaRpcHandler.class);
 
     // 客户端持有的与服务端的连接
-    private static Map<String, Map<String, ConnectFuture>> minaConnections = new HashMap<>();
+    private static Map<String, Map<String, ConnectFuture>> minaConnections = new ConcurrentHashMap<>();
 
     @Override
     public void bindService(int port) {
         try {
             // 创建服务端监控线程
-            IoAcceptor acceptor = new NioSocketAcceptor(10);
+            IoAcceptor acceptor = new NioSocketAcceptor(5);
             acceptor.getSessionConfig().setReadBufferSize(2048);
             acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
             // 设置日志记录器
@@ -52,7 +49,7 @@ public class MinaRpcHandler extends RpcHandler {
                     0l,
                     TimeUnit.MILLISECONDS,
                     requestQueue,
-                    new NamedThreadFactory("processThread",true),
+                    new NamedThreadFactory("processThread", true),
                     rejectedExecutionHandler);
             // 指定业务逻辑处理器
             acceptor.setHandler(new MinaServerHandler(processPoolExecutor));
@@ -122,9 +119,10 @@ public class MinaRpcHandler extends RpcHandler {
                 if (null == cf) {
                     String[] ipPort = serverAddress.split(":");
                     // 创建客户端连接器
-                    NioSocketConnector connector = new NioSocketConnector(10);
+                    NioSocketConnector connector = new NioSocketConnector(5);
 //                    connector.getFilterChain().addLast("logger", new LoggingFilter());
                     connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
+                    connector.getFilterChain().addLast("exec", new ExecutorFilter(new UnorderedThreadPoolExecutor()));
                     // 设置连接超时检查时间
                     connector.setConnectTimeoutCheckInterval(30);
                     if (isSync) connector.getSessionConfig().setUseReadOperation(true); // 同步连接

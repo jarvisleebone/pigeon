@@ -19,7 +19,7 @@ public class PigeonConfig implements ApplicationListener {
     public static final Map<String, ServiceConfig> serviceConfigs = new HashMap<>();
     // 服务端提供的接口名字集合
     public static final Set<String> serviceInterfaceNames = new HashSet<>();
-    // 服务端提供的所有方法实现集合
+    // 服务端提供的所有方法集合
     public static final Map<String, Method> serviceMethods = new HashMap<>();
     // 客户端使用的接口集合
     public static final Set<String> clientInterfaceNames = new HashSet<>();

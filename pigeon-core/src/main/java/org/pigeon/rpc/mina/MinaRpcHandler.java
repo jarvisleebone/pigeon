@@ -9,8 +9,12 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory;
 import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.filter.executor.UnorderedThreadPoolExecutor;
+import org.apache.mina.transport.socket.SocketAcceptor;
+import org.apache.mina.transport.socket.SocketConnector;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
+import org.pigeon.common.NamedThreadFactory;
+import org.pigeon.common.ServerRejectedExecutorHandler;
 import org.pigeon.model.PigeonRequest;
 import org.pigeon.rpc.RpcHandler;
 
@@ -18,7 +22,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MinaRpcHandler extends RpcHandler {
 
@@ -31,17 +36,26 @@ public class MinaRpcHandler extends RpcHandler {
     public void bindService(int port) {
         try {
             // 创建服务端监控线程
-            IoAcceptor acceptor = new NioSocketAcceptor();
+            IoAcceptor acceptor = new NioSocketAcceptor(10);
             acceptor.getSessionConfig().setReadBufferSize(2048);
             acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
             // 设置日志记录器
 //             acceptor.getFilterChain().addLast("logger", new LoggingFilter());
             // 设置编码过滤器
             acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
-//            acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new PigeonSerializationCodecFactory()));
-//            acceptor.getFilterChain().addLast("exec", new ExecutorFilter(new UnorderedThreadPoolExecutor()));
+            // 配置ThreadPoolExecutor
+            BlockingQueue<Runnable> requestQueue = new LinkedBlockingDeque<>();
+            RejectedExecutionHandler rejectedExecutionHandler = new ServerRejectedExecutorHandler();
+            ThreadPoolExecutor processPoolExecutor = new ThreadPoolExecutor(
+                    512,
+                    512,
+                    0l,
+                    TimeUnit.MILLISECONDS,
+                    requestQueue,
+                    new NamedThreadFactory("processThread",true),
+                    rejectedExecutionHandler);
             // 指定业务逻辑处理器
-            acceptor.setHandler(new MinaServerHandler());
+            acceptor.setHandler(new MinaServerHandler(processPoolExecutor));
             // 设置端口号
             acceptor.bind(new InetSocketAddress(port));
             // 启动监听线程
@@ -108,11 +122,9 @@ public class MinaRpcHandler extends RpcHandler {
                 if (null == cf) {
                     String[] ipPort = serverAddress.split(":");
                     // 创建客户端连接器
-                    NioSocketConnector connector = new NioSocketConnector();
+                    NioSocketConnector connector = new NioSocketConnector(10);
 //                    connector.getFilterChain().addLast("logger", new LoggingFilter());
                     connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
-//                    connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new PigeonSerializationCodecFactory()));
-//                    connector.getFilterChain().addLast("exec", new ExecutorFilter(new UnorderedThreadPoolExecutor()));
                     // 设置连接超时检查时间
                     connector.setConnectTimeoutCheckInterval(30);
                     if (isSync) connector.getSessionConfig().setUseReadOperation(true); // 同步连接

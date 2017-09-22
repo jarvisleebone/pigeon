@@ -10,12 +10,19 @@ import org.pigeon.rpc.RpcHandler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.concurrent.Executor;
 
 public class MinaServerHandler extends IoHandlerAdapter {
 
+    private Executor executor;
+
+    public MinaServerHandler(Executor executor) {
+        this.executor = executor;
+    }
+
     @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
-        RpcHandler.execute(() -> {
+        executor.execute(() -> {
             try {
                 PigeonRequest request = (PigeonRequest) message;
                 ServiceConfig serviceConfig = PigeonConfig.serviceConfigs.get(request.getInterfaceName());
@@ -44,5 +51,4 @@ public class MinaServerHandler extends IoHandlerAdapter {
             }
         });
     }
-
 }

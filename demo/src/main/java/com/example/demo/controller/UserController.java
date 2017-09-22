@@ -2,9 +2,9 @@
  * Zentech-Inc
  * Copyright (C) 2017 All Rights Reserved.
  */
-package com.example.demo;
+package com.example.demo.controller;
 
-import org.pigeon.demo.server.service.HelloService;
+import org.pigeon.demo.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -15,15 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
  * @version $Id TestController.java, v 0.1 2017-09-19 19:28 lixiang Exp $$
  */
 @RestController
-public class TestController {
+public class UserController {
 
     @Autowired
-    private HelloService helloService;
+    private UserService userService;
 
-    @GetMapping("test")
+    @GetMapping("getUser")
     @ResponseBody
-    public String test() {
-        return helloService.hello("test");
+    public String getUser(String userid) {
+        return userService.getUser(userid).toString();
     }
-
 }

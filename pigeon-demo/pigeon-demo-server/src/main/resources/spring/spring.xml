@@ -9,16 +9,19 @@
        http://pigeon.org/schema/pigeon.xsd">
 
     <!--<pigeon:config id="config" address="192.168.0.165" port="8962" protocol="mina" serializer="protostuff" />-->
-    <!--<pigeon:config id="config" address="10.0.1.82" port="8962" protocol="mina" serializer="protostuff" />-->
-    <pigeon:config id="config" address="10.0.3.91" port="8962" protocol="mina" serializer="protostuff" />
+    <pigeon:config id="config" address="10.0.1.82" port="8962" protocol="mina" serializer="protostuff" />
+    <!--<pigeon:config id="config" address="10.0.3.91" port="8962" protocol="mina" serializer="protostuff" />-->
 
     <!--<pigeon:registry id="registry" protocol="zookeeper" address="192.168.0.114" port="2181"/>-->
-    <!--<pigeon:registry id="registry" protocol="zookeeper" address="10.0.1.57" port="2181" />-->
-    <pigeon:registry id="registry" protocol="zookeeper" address="192.168.216.135" port="2181" />
+    <pigeon:registry id="registry" protocol="zookeeper" address="10.0.1.57" port="2181" />
+    <!--<pigeon:registry id="registry" protocol="zookeeper" address="192.168.216.135" port="2181" />-->
 
-    <pigeon:service id="testService" interface="org.pigeon.demo.server.service.TestService" ref="testServiceImpl" />
-    <pigeon:service id="helloService" interface="org.pigeon.demo.server.service.HelloService" ref="helloServiceImpl" />
+    <!--<pigeon:service id="testService" interface="org.pigeon.demo.server.service.TestService" ref="testServiceImpl" />-->
+    <!--<pigeon:service id="helloService" interface="org.pigeon.demo.server.service.HelloService" ref="helloServiceImpl" />-->
 
-    <bean class="org.pigeon.demo.server.service.impl.TestServiceImpl" id="testServiceImpl" />
-    <bean class="org.pigeon.demo.server.service.impl.HelloServiceImpl" id="helloServiceImpl" />
+    <pigeon:service id="userService" interface="org.pigeon.demo.server.service.UserService" ref="userServiceImpl" />
+
+    <!--<bean class="org.pigeon.demo.server.service.impl.TestServiceImpl" id="testServiceImpl" />-->
+    <!--<bean class="org.pigeon.demo.server.service.impl.HelloServiceImpl" id="helloServiceImpl" />-->
+    <bean class="org.pigeon.demo.server.service.impl.UserServiceImpl" id="userServiceImpl" />
 </beans>

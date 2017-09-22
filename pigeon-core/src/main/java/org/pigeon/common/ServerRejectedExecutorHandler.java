@@ -15,6 +15,7 @@ public class ServerRejectedExecutorHandler implements RejectedExecutionHandler {
 
     @Override
     public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+        // TODO 拒绝连接
         System.out.println("拒绝");
     }
 }

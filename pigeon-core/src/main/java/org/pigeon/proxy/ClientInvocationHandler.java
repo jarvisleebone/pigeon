@@ -10,7 +10,6 @@ import org.pigeon.config.PigeonConfig;
 import org.pigeon.config.handler.ConfigHandler;
 import org.pigeon.model.PigeonRequest;
 import org.pigeon.registry.RegisterHandler;
-import org.pigeon.router.Router;
 import org.pigeon.rpc.RpcHandler;
 
 import java.lang.reflect.InvocationHandler;
@@ -42,10 +41,11 @@ public class ClientInvocationHandler<T> implements InvocationHandler {
         request.setInterfaceName(clazz.getName());
         request.setMethodSign(methodSign);
         request.setReturnType(method.getReturnType().getName());
-        if (null != args && 0 != args.length)
+        if (null != args && 0 != args.length) {
             request.setParameters(args);
+        }
         MethodConfig methodConfig = PigeonConfig.methodConfigs.get(methodSign);
-        request.setSync(null == methodConfig ? true : methodConfig.isSync());
+        request.setSync(null == methodConfig || methodConfig.isSync());
 
         // 服务选举
         List<String> servers = RegisterHandler.services.get(request.getInterfaceName());

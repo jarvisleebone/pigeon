@@ -10,12 +10,10 @@ public class RegisterHandlerFactory {
     public static RegisterHandler getRegisterHandler(String protocol, String address, int port) {
 
         RegistryProtocolEnum protocolEnum = RegistryProtocolEnum.valueOf(protocol.toUpperCase());
-        switch (protocolEnum) {
-            case ZOOKEEPER:
-                registerHandler = new ZKRegisterHandler(address, port);
-                break;
-            default:
-                registerHandler = new ZKRegisterHandler(address, port);
+        if (protocolEnum == RegistryProtocolEnum.ZOOKEEPER) {
+            registerHandler = new ZKRegisterHandler(address, port);
+        } else {
+            registerHandler = new ZKRegisterHandler(address, port);
         }
         return registerHandler;
     }

@@ -20,14 +20,21 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class MinaRpcHandler extends RpcHandler {
 
     private static final Logger LOGGER = Logger.getLogger(MinaRpcHandler.class);
 
-    // 客户端持有的与服务端的连接
-    private static Map<String, Map<String, ConnectFuture>> minaConnections = new ConcurrentHashMap<>();
+    /**
+     * 客户端持有的与服务端的连接
+     */
+    private static final Map<String, Map<String, ConnectFuture>> CONNECTIONS = new ConcurrentHashMap<>();
 
     @Override
     public void bindService(int port) {
@@ -36,8 +43,6 @@ public class MinaRpcHandler extends RpcHandler {
             IoAcceptor acceptor = new NioSocketAcceptor(5);
             acceptor.getSessionConfig().setReadBufferSize(2048);
             acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
-            // 设置日志记录器
-//             acceptor.getFilterChain().addLast("logger", new LoggingFilter());
             // 设置编码过滤器
             acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
             // 配置ThreadPoolExecutor
@@ -46,7 +51,7 @@ public class MinaRpcHandler extends RpcHandler {
             ThreadPoolExecutor processPoolExecutor = new ThreadPoolExecutor(
                     512,
                     512,
-                    0l,
+                    0L,
                     TimeUnit.MILLISECONDS,
                     requestQueue,
                     new NamedThreadFactory("processThread", true),
@@ -67,7 +72,7 @@ public class MinaRpcHandler extends RpcHandler {
         // 初始化连接
         initConn(request.isSync(), serverAddress);
         // 获取连接
-        ConnectFuture cf = minaConnections.get(serverAddress).get("sync");
+        ConnectFuture cf = CONNECTIONS.get(serverAddress).get("sync");
         // 请求发送到服务端
         if ("void".equals(request.getReturnType())) {
             // 接口无返回值无需等待发送完成，直接返回null
@@ -88,11 +93,11 @@ public class MinaRpcHandler extends RpcHandler {
     }
 
     @Override
-    public void sendMessageAsync(PigeonRequest request, String serverAddress) throws Exception {
+    public void sendMessageAsync(PigeonRequest request, String serverAddress) {
         // 初始化连接
         initConn(request.isSync(), serverAddress);
         // 获取连接
-        ConnectFuture cf = minaConnections.get(serverAddress).get("async");
+        ConnectFuture cf = CONNECTIONS.get(serverAddress).get("async");
         // 请求发送到服务端
         cf.getSession().write(request);
     }
@@ -104,35 +109,35 @@ public class MinaRpcHandler extends RpcHandler {
      * @param serverAddress
      */
     private void initConn(boolean isSync, String serverAddress) {
-        if (null == minaConnections.get(serverAddress)) {
-            synchronized (minaConnections) {
-                if (null == minaConnections.get(serverAddress)) {
-                    minaConnections.put(serverAddress, new HashMap<>());
-                }
+        if (null == CONNECTIONS.get(serverAddress)) {
+            synchronized (CONNECTIONS) {
+                CONNECTIONS.computeIfAbsent(serverAddress, k -> new HashMap<>());
             }
         }
 
         String connType = isSync ? "sync" : "async";
-        ConnectFuture cf = minaConnections.get(serverAddress).get(connType);
+        ConnectFuture cf = CONNECTIONS.get(serverAddress).get(connType);
         if (null == cf) {
-            synchronized (minaConnections) {
-                if (null == cf) {
-                    String[] ipPort = serverAddress.split(":");
-                    // 创建客户端连接器
-                    NioSocketConnector connector = new NioSocketConnector(5);
-//                    connector.getFilterChain().addLast("logger", new LoggingFilter());
-                    connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
-                    connector.getFilterChain().addLast("exec", new ExecutorFilter(new UnorderedThreadPoolExecutor()));
-                    // 设置连接超时检查时间
-                    connector.setConnectTimeoutCheckInterval(30);
-                    if (isSync) connector.getSessionConfig().setUseReadOperation(true); // 同步连接
-                    else connector.setHandler(new MinaClientHandler()); // 异步连接
-                    // 创建连接
-                    cf = connector.connect(new InetSocketAddress(ipPort[0], Integer.parseInt(ipPort[1])));
-                    // 等待连接创建完成
-                    cf.awaitUninterruptibly();
-                    minaConnections.get(serverAddress).put(connType, cf);
+            synchronized (CONNECTIONS) {
+                String[] ipPort = serverAddress.split(":");
+                // 创建客户端连接器
+                NioSocketConnector connector = new NioSocketConnector(5);
+                connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ObjectSerializationCodecFactory()));
+                connector.getFilterChain().addLast("exec", new ExecutorFilter(new UnorderedThreadPoolExecutor()));
+                // 设置连接超时检查时间
+                connector.setConnectTimeoutCheckInterval(30);
+                if (isSync) {
+                    // 同步连接
+                    connector.getSessionConfig().setUseReadOperation(true);
+                } else {
+                    // 异步连接
+                    connector.setHandler(new MinaClientHandler());
                 }
+                // 创建连接
+                cf = connector.connect(new InetSocketAddress(ipPort[0], Integer.parseInt(ipPort[1])));
+                // 等待连接创建完成
+                cf.awaitUninterruptibly();
+                CONNECTIONS.get(serverAddress).put(connType, cf);
             }
         }
     }

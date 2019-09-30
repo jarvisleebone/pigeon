@@ -6,7 +6,6 @@ import org.pigeon.config.PigeonConfig;
 import org.pigeon.config.ServiceConfig;
 import org.pigeon.model.PigeonRequest;
 import org.pigeon.model.PigeonResponse;
-import org.pigeon.rpc.RpcHandler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,14 +20,15 @@ public class MinaServerHandler extends IoHandlerAdapter {
     }
 
     @Override
-    public void messageReceived(IoSession session, Object message) throws Exception {
+    public void messageReceived(IoSession session, Object message) {
         executor.execute(() -> {
             try {
                 PigeonRequest request = (PigeonRequest) message;
                 ServiceConfig serviceConfig = PigeonConfig.serviceConfigs.get(request.getInterfaceName());
                 Method method = PigeonConfig.serviceMethods.get(request.getMethodSign());
-                if (null == method)
+                if (null == method) {
                     throw new NoSuchMethodException();
+                }
 
                 if ("void".equals(request.getReturnType())) {
                     method.invoke(serviceConfig.getRef(), request.getParameters());
@@ -42,11 +42,7 @@ public class MinaServerHandler extends IoHandlerAdapter {
                         session.write(response);
                     }
                 }
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 e.printStackTrace();
             }
         });

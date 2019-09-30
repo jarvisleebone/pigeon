@@ -10,9 +10,7 @@
 
     <pigeon:config id="config" protocol="mina" route="rr" serializer="protostuff" />
 
-    <!--<pigeon:registry id="registry" protocol="zookeeper" address="192.168.0.114" port="2181" />-->
-    <!--<pigeon:registry id="registry" protocol="zookeeper" address="10.0.1.57" port="2181" />-->
-    <pigeon:registry id="registry" protocol="zookeeper" address="192.168.216.135" port="2181" />
+    <pigeon:registry id="registry" protocol="zookeeper" address="116.62.188.141" port="2181"/>
 
     <pigeon:client id="testService" interface="org.pigeon.demo.server.service.TestService">
         <pigeon:method id="testAsync0" name="testAsync" sync="false" />
@@ -44,8 +42,6 @@
             <pigeon:paramter javaType="int" seq="1" />
         </pigeon:method>
     </pigeon:client>
-
-    <pigeon:client id="helloService" interface="org.pigeon.demo.server.service.HelloService" />
 
     <bean id="testAsyncCallback" class="org.pigeon.demo.client.callback.TestAsyncCallback" />
     <bean id="testAsync2Callback" class="org.pigeon.demo.client.callback.TestAsync2Callback" />

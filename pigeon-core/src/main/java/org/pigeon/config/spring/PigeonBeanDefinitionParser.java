@@ -6,7 +6,11 @@ import org.pigeon.common.enums.RegistryProtocolEnum;
 import org.pigeon.common.enums.RouteProtocolEnum;
 import org.pigeon.common.enums.RpcProtocolEnum;
 import org.pigeon.common.enums.SerializerProtocolEnum;
-import org.pigeon.config.*;
+import org.pigeon.config.ClientConfig;
+import org.pigeon.config.MethodConfig;
+import org.pigeon.config.PigeonConfig;
+import org.pigeon.config.RegistryConfig;
+import org.pigeon.config.ServiceConfig;
 import org.pigeon.config.handler.ConfigHandler;
 import org.pigeon.registry.RegisterHandlerFactory;
 import org.pigeon.router.RouterFactory;
@@ -47,13 +51,15 @@ public class PigeonBeanDefinitionParser implements BeanDefinitionParser {
             String serializer = element.getAttribute("serializer");
             String route = element.getAttribute("route");
 
-            if (StringUtils.isEmpty(protocol))
+            if (StringUtils.isEmpty(protocol)) {
                 protocol = RpcProtocolEnum.MINA.toString();
-            if (StringUtils.isEmpty(serializer))
+            }
+            if (StringUtils.isEmpty(serializer)) {
                 serializer = SerializerProtocolEnum.PROTOSTUFF.toString();
-            if (StringUtils.isEmpty(route))
+            }
+            if (StringUtils.isEmpty(route)) {
                 route = RouteProtocolEnum.RANDOM.toString();
-
+            }
             if (StringUtils.isNotEmpty(address) && StringUtils.isNotEmpty(port)) {
                 beanDefinition.getPropertyValues().addPropertyValue("address", element.getAttribute("address"));
                 beanDefinition.getPropertyValues().addPropertyValue("port", element.getAttribute("port"));
@@ -70,8 +76,9 @@ public class PigeonBeanDefinitionParser implements BeanDefinitionParser {
             String address = element.getAttribute("address");
             int port = Integer.parseInt(element.getAttribute("port"));
             String protocol = element.getAttribute("protocol");
-            if (StringUtils.isEmpty(protocol))
+            if (StringUtils.isEmpty(protocol)) {
                 protocol = RegistryProtocolEnum.ZOOKEEPER.toString();
+            }
 
             beanDefinition.getPropertyValues().addPropertyValue("address", address);
             beanDefinition.getPropertyValues().addPropertyValue("port", port);
@@ -106,8 +113,9 @@ public class PigeonBeanDefinitionParser implements BeanDefinitionParser {
             beanDefinition.getPropertyValues().add("name", methodName);
             beanDefinition.getPropertyValues().add("sync", element.getAttribute("sync"));
             String callback = element.getAttribute("callback");
-            if (StringUtils.isNotEmpty(callback))
+            if (StringUtils.isNotEmpty(callback)) {
                 beanDefinition.getPropertyValues().add("callback", new RuntimeBeanReference(callback));
+            }
             // 解析参数列表配置
             NodeList paramterTypes = element.getChildNodes();
             if (null != paramterTypes && 0 != paramterTypes.getLength()) {

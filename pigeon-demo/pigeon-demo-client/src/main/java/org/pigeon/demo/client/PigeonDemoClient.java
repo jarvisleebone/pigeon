@@ -1,7 +1,6 @@
 package org.pigeon.demo.client;
 
 import org.pigeon.demo.server.model.Person;
-import org.pigeon.demo.server.service.HelloService;
 import org.pigeon.demo.server.service.TestService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -20,7 +19,6 @@ public class PigeonDemoClient {
         System.out.println("client start");
 
         TestService testService = applicationContext.getBean(TestService.class);
-        HelloService helloService = applicationContext.getBean(HelloService.class);
 
         Person p = new Person("person", 50);
         // sync
@@ -57,9 +55,7 @@ public class PigeonDemoClient {
 
         for (int i = 0; i < count; i++) {
             fixedThreadPool.execute(() -> {
-//                String str = helloService.hello("test");
-                String str = testService.testSync("[INFO ][2017-09-19 13:46:37,526][NotifyFacadeImpl$2:336] 短信同步发送日志记录成功：mobile=17681802566,template=SMS_78415031:APP开户初审不通过,args={prodclient=布林证券交易端, telephone=4008-8888-8888} path:/root/logs/westockcore/westockcore-baseservice.log @timestamp:September 19th 2017, 13:46:38.756 @version:1 host:10.0.1.92 type:westockcore-baseservice _id:AV6YrI022E46rrktWRGF _type:westockcore-baseservice _index:logstash-2017.09.19 _score:");
-//                testService.testAsync("test async", 20);
+                System.out.println(testService.testSync("测试接口请求"));
                 countDown.countDown();
             });
         }
